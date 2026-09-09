@@ -1,0 +1,19 @@
+Program        ::= { Statement } ;
+
+Statement      ::= ExprStatement ;
+ExprStatement  ::= CallExpr , ";" ;
+
+CallExpr       ::= Identifier , "(" , [ ArgumentList ] , ")" ;
+
+ArgumentList   ::= Expression , { "," , Expression } ;
+
+Expression     ::= StringLiteral ;
+
+Identifier     ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
+StringLiteral  ::= '"' , { StringCharacter } , '"' ;
+
+Letter         ::= "a" | ... | "z" | "A" | ... | "Z" ;
+Digit          ::= "0" | ... | "9" ;
+
+StringCharacter ::= ? any character except '"' and newline ? | EscapeSequence ;
+EscapeSequence ::= "\" , ( '"' | "\" | "n" | "t" | "r" ) ;
