@@ -90,7 +90,6 @@ class Scanner
 	private function extractString(): string|false
 	{
 		$this->consume();
-		$start = $this->pos;
 		$chars = [];
 
 		while (true) {
@@ -104,11 +103,37 @@ class Scanner
 				return false;
 			}
 
-			$chars[] = $this->consume();
-
 			if ($ch === '"') {
+				$this->consume();
 				break;
 			}
+
+			if ($ch === "\\") {
+				$this->consume();
+
+				if ($this->isAtEnd()) {
+					return false;
+				}
+
+				$escaped = $this->consume();
+				$escape = match ($escaped) {
+					'"' => '"',
+					"\\" => "\\",
+					"n" => "\n",
+					"t" => "\t",
+					"r" => "\r",
+					default => null,
+				};
+
+				if ($escape === null) {
+					$escape = "\\" . $escaped;
+				}
+
+				$chars[] = $escape;
+				continue;
+			}
+
+			$chars[] = $this->consume();
 		}
 
 		return implode("", $chars);
