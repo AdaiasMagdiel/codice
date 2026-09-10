@@ -4,15 +4,18 @@ namespace App;
 
 use App\Exceptions\CodiceError;
 use App\Lexer\Scanner;
+use App\Parser\Parser;
 use Throwable;
 
 class Codice
 {
 	private Scanner $scanner;
+	private Parser $parser;
 
 	public function __construct()
 	{
 		$this->scanner = new Scanner();
+		$this->parser = new Parser();
 	}
 
 	public function runFile(string $filePath): int
@@ -22,13 +25,17 @@ class Codice
 			return 1;
 		}
 
-		$content = file_get_contents($filePath);
-		$this->scanner->init(basename($filePath), $content);
-
 		try {
-			$tokens = $this->scanner->scan();
+			$content = file_get_contents($filePath);
+			$this->scanner->init(basename($filePath), $content);
 
-			print_r($tokens);
+			$tokens = $this->scanner->scan();
+			$this->parser->init($tokens);
+
+			$ast = $this->parser->parse();
+
+			$content = print_r($ast, true);
+			echo str_replace("    ", "..", $content) . PHP_EOL;
 		} catch (CodiceError $e) {
 			echo $e;
 			return 1;

@@ -10,6 +10,7 @@ class Symbol
         ';' => TokenType::SEMICOLON,
         '(' => TokenType::LEFT_PAREN,
         ')' => TokenType::RIGHT_PAREN,
+        "," => TokenType::COMMA
     ];
 
     public static function from(string $value): ?TokenType

@@ -10,6 +10,7 @@ enum TokenType
 	case SEMICOLON;
 	case LEFT_PAREN;
 	case RIGHT_PAREN;
+	case COMMA;
 
 	case EOF;
 }

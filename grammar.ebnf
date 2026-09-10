@@ -1,13 +1,12 @@
 Program        ::= { Statement } ;
 
 Statement      ::= ExprStatement ;
-ExprStatement  ::= CallExpr , ";" ;
+ExprStatement  ::= Expression , ";" ;
+
+Expression ::= StringLiteral | CallExpr | Identifier ;
 
 CallExpr       ::= Identifier , "(" , [ ArgumentList ] , ")" ;
-
 ArgumentList   ::= Expression , { "," , Expression } ;
-
-Expression     ::= StringLiteral ;
 
 Identifier     ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
 StringLiteral  ::= '"' , { StringCharacter } , '"' ;
