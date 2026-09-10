@@ -5,18 +5,26 @@ namespace App;
 use App\Exceptions\CodiceError;
 use App\Lexer\Scanner;
 use App\Parser\Parser;
+use App\Runtime\Environment;
+use App\Runtime\Interpreter;
 use Throwable;
 
 class Codice
 {
 	private Scanner $scanner;
 	private Parser $parser;
+	private Interpreter $interpreter;
+	private Environment $environment;
 
 	public function __construct()
 	{
 		$this->scanner = new Scanner();
 		$this->parser = new Parser();
+		$this->interpreter = new Interpreter();
+		$this->environment = new Environment();
 	}
+
+	public function runREPL() {}
 
 	public function runFile(string $filePath): int
 	{
@@ -32,10 +40,9 @@ class Codice
 			$tokens = $this->scanner->scan();
 			$this->parser->init($tokens);
 
-			$ast = $this->parser->parse();
+			$program = $this->parser->parse();
 
-			$content = print_r($ast, true);
-			echo str_replace("    ", "..", $content) . PHP_EOL;
+			$this->interpreter->run($program, $this->environment);
 		} catch (CodiceError $e) {
 			echo $e;
 			return 1;
