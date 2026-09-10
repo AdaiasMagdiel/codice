@@ -89,3 +89,23 @@ it('reports a parse error when a semicolon is missing', function () {
 it('reports a parse error when an expression is missing', function () {
     parseParserSource(';');
 })->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
+
+it('parses multiple statements in a single program', function () {
+    $program = parseParserSource('saluto; saluta();');
+
+    expect($program->statements)->toHaveCount(2)
+        ->and($program->statements[0]->expr)->toBeInstanceOf(Identifier::class)
+        ->and($program->statements[1]->expr)->toBeInstanceOf(CallExpr::class);
+});
+
+it('reports a parse error when an empty call is missing the closing parenthesis', function () {
+    parseParserSource('saluta(');
+})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
+
+it('reports a parse error when a call with arguments is missing the closing parenthesis', function () {
+    parseParserSource('saluta("ciao"');
+})->throws(ParseError::class, "Atteso 'RIGHT_PAREN', ma è stato trovato 'EOF'.");
+
+it('reports a parse error on a trailing comma in an argument list', function () {
+    parseParserSource('saluta("ciao",);');
+})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
