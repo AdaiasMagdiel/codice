@@ -10,6 +10,13 @@ Written in PHP, it is deliberately simple and unfinished in places. Expect rough
 stampa("Ciao, mondo!");
 ```
 
+Running it:
+
+```sh
+$ php codice.php examples/ciao_mondo.cod
+Ciao, mondo!
+```
+
 ## Usage
 
 ```sh
@@ -31,8 +38,19 @@ The current grammar is defined in [grammar.ebnf](grammar.ebnf).
 
 Early and experimental. Nothing here should be considered stable or production-ready.
 
-Only the lexer is implemented so far: source code is tokenized, but there is
-no parser or evaluator yet, so nothing actually runs end to end.
+The pipeline runs end to end now: the lexer tokenizes source code, the
+parser builds an AST from it, and a tree-walking interpreter executes that
+AST directly. Right now the language only understands string literals,
+identifiers, and function calls — `stampa` (print) is the only builtin.
+There is no REPL, no variables, no control flow, and no user-defined
+functions yet.
+
+## Tests
+
+```sh
+composer test            # Run the test suite (Pest)
+composer test:coverage   # Run with coverage report (requires Xdebug)
+```
 
 ## License
 
