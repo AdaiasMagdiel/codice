@@ -1,0 +1,91 @@
+<?php
+
+use App\Ast\CallExpr;
+use App\Ast\ExprStatement;
+use App\Ast\Identifier;
+use App\Ast\Program;
+use App\Ast\StringLiteral;
+use App\Exceptions\ParseError;
+use App\Lexer\Scanner;
+use App\Parser\Parser;
+
+function parseParserSource(string $source): Program
+{
+    $scanner = new Scanner();
+    $scanner->init('test.cod', $source);
+
+    $parser = new Parser();
+    $parser->init($scanner->scan());
+
+    return $parser->parse();
+}
+
+it('parses an empty program', function () {
+    $program = parseParserSource('');
+
+    expect($program->statements)->toBe([]);
+});
+
+it('parses a string literal expression statement', function () {
+    $program = parseParserSource('"ciao";');
+
+    expect($program->statements)->toHaveCount(1)
+        ->and($program->statements[0])->toBeInstanceOf(ExprStatement::class)
+        ->and($program->statements[0]->expr)->toBeInstanceOf(StringLiteral::class)
+        ->and($program->statements[0]->expr->token->lexeme)->toBe('ciao');
+});
+
+it('keeps unknown letter escapes in string literals', function () {
+    $program = parseParserSource('"ciao\z";');
+
+    expect($program->statements[0]->expr)->toBeInstanceOf(StringLiteral::class)
+        ->and($program->statements[0]->expr->token->lexeme)->toBe('ciao\z');
+});
+
+it('parses an identifier expression statement', function () {
+    $program = parseParserSource('saluto;');
+
+    expect($program->statements)->toHaveCount(1)
+        ->and($program->statements[0]->expr)->toBeInstanceOf(Identifier::class)
+        ->and($program->statements[0]->expr->token->lexeme)->toBe('saluto');
+});
+
+it('parses a call expression without arguments', function () {
+    $program = parseParserSource('saluta();');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->callee)->toBe('saluta')
+        ->and($expr->args)->toBe([]);
+});
+
+it('parses a call expression with arguments', function () {
+    $program = parseParserSource('saluta("ciao", nome);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->callee)->toBe('saluta')
+        ->and($expr->args)->toHaveCount(2)
+        ->and($expr->args[0])->toBeInstanceOf(StringLiteral::class)
+        ->and($expr->args[0]->token->lexeme)->toBe('ciao')
+        ->and($expr->args[1])->toBeInstanceOf(Identifier::class);
+});
+
+it('parses nested call expressions as arguments', function () {
+    $program = parseParserSource('scrivi(formatta("ciao"));');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->callee)->toBe('scrivi')
+        ->and($expr->args)->toHaveCount(1)
+        ->and($expr->args[0])->toBeInstanceOf(CallExpr::class)
+        ->and($expr->args[0]->callee)->toBe('formatta');
+});
+
+it('reports a parse error when a semicolon is missing', function () {
+    parseParserSource('saluta()');
+})->throws(ParseError::class, "Atteso 'SEMICOLON', ma è stato trovato 'EOF'.");
+
+it('reports a parse error when an expression is missing', function () {
+    parseParserSource(';');
+})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');

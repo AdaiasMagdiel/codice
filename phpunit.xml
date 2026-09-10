@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    colors="true"
+    bootstrap="vendor/autoload.php"
+    cacheDirectory=".phpunit.cache"
+>
+    <testsuites>
+        <testsuite name="Codice">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>app/Ast</directory>
+            <directory>app/Parser</directory>
+        </include>
+    </source>
+</phpunit>
