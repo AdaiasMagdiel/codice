@@ -40,10 +40,12 @@ Early and experimental. Nothing here should be considered stable or production-r
 
 The pipeline runs end to end now: the lexer tokenizes source code, the
 parser builds an AST from it, and a tree-walking interpreter executes that
-AST directly. Right now the language only understands string literals,
-identifiers, and function calls — `stampa` (print) is the only builtin.
-There is no REPL, no variables, no control flow, and no user-defined
-functions yet.
+AST directly. Values are represented by a small runtime type system
+(`App\Types`): `stringa` (string), `booleano` (`vero`/`falso`), and `nullo`
+(null — also the default return value of any function call). Beyond
+literals, identifiers, and function calls — `stampa` (print) is the only
+builtin — there is no REPL, no variables, no control flow, and no
+user-defined functions yet.
 
 ## Tests
 
