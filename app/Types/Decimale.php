@@ -11,6 +11,8 @@ class Decimale implements Type
     #[Override]
     public function __toString()
     {
-        return (string) $this->value;
+        $value = (string) $this->value;
+
+        return str_contains($value, '.') ? $value : $value . '.0';
     }
 }

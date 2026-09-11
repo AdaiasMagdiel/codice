@@ -1,6 +1,4 @@
-stampa(42);
-stampa(1_000_000);
-stampa(3.1415926535);
-stampa(nullo);
-stampa(vero);
-stampa(falso);
+stampa("Interi: ", 42, ", ", 1_000_000);
+stampa("Decimali: ", 3.14, ", ", .5, ", ", 1_234.567_89, ", ", 67.);
+stampa("Booleani: ", vero, ", ", falso);
+stampa("Nullo: ", nullo);
