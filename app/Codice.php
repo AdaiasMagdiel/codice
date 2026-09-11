@@ -24,7 +24,32 @@ class Codice
 		$this->environment = new Environment();
 	}
 
-	public function runREPL() {}
+	public function runREPL()
+	{
+		while (true) {
+			$line = readline(">>> ");
+
+			if ($line === false) {
+				echo "\nCiao!\n";
+				break;
+			}
+
+			$line = trim($line);
+
+			if ($line === 'esci') {
+				echo "Ciao!\n";
+				break;
+			}
+
+			if ($line === '') {
+				continue;
+			}
+
+			readline_add_history($line);
+
+			$this->run('stdin', $line);
+		}
+	}
 
 	public function runFile(string $filePath): int
 	{
@@ -33,9 +58,14 @@ class Codice
 			return 1;
 		}
 
+		$content = file_get_contents($filePath);
+		return $this->run(basename($filePath), $content);
+	}
+
+	public function run(string $file, string $content): int
+	{
 		try {
-			$content = file_get_contents($filePath);
-			$this->scanner->init(basename($filePath), $content);
+			$this->scanner->init($file, $content);
 
 			$tokens = $this->scanner->scan();
 			$this->parser->init($tokens);

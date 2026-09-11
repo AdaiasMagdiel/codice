@@ -31,9 +31,8 @@ if (PHP_SAPI !== 'cli') {
 }
 
 if ($argc === 1) {
-	echo "REPL non ancora implementato.\n";
-	exit(0);
+	$codice->runREPL();
+} else {
+	$filepath = $argv[1];
+	exit($codice->runFile($filepath));
 }
-
-$filepath = $argv[1];
-exit($codice->runFile($filepath));
