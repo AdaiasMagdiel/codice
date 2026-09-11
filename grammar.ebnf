@@ -1,20 +1,25 @@
-Program        ::= { Statement } ;
+Program         ::= { Statement } ;
 
-Statement      ::= ExprStatement ;
-ExprStatement  ::= Expression , ";" ;
+Statement       ::= ExprStatement ;
+ExprStatement   ::= Expression , ";" ;
 
-Expression ::= StringLiteral | CallExpr | Identifier | NullLiteral | BoolLiteral ;
+Expression      ::= StringLiteral | CallExpr | Identifier |
+                    NullLiteral | BoolLiteral | IntLiteral | FloatLiteral ;
 
-CallExpr       ::= Identifier , "(" , [ ArgumentList ] , ")" ;
-ArgumentList   ::= Expression , { "," , Expression } ;
+CallExpr        ::= Identifier , "(" , [ ArgumentList ] , ")" ;
+ArgumentList    ::= Expression , { "," , Expression } ;
 
-Identifier     ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
-StringLiteral  ::= '"' , { StringCharacter } , '"' ;
-NullLiteral    ::= "nullo" ;
-BoolLiteral    ::= "vero" | "falso" ;
+Identifier      ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
+StringLiteral   ::= '"' , { StringCharacter } , '"' ;
+NullLiteral     ::= "nullo" ;
+BoolLiteral     ::= "vero" | "falso" ;
+IntLiteral      ::= "0" | ( NonZeroDigit , DigitGroup ) ;
+FloatLiteral    ::= IntLiteral , "." , [ Digit , DigitGroup ] ;
 
-Letter         ::= "a" | ... | "z" | "A" | ... | "Z" ;
-Digit          ::= "0" | ... | "9" ;
+Letter          ::= "a" | ... | "z" | "A" | ... | "Z" ;
+NonZeroDigit    ::= "1" | ... | "9" ;
+Digit           ::= "0" | NonZeroDigit ;
+DigitGroup      ::= { [ "_" ] , Digit } ;
 
 StringCharacter ::= ? any character except '"' and newline ? | EscapeSequence ;
-EscapeSequence ::= "\" , ( '"' | "\" | "n" | "t" | "r" ) ;
+EscapeSequence  ::= "\" , ( '"' | "\" | "n" | "t" | "r" ) ;

@@ -1,3 +1,6 @@
+stampa(42);
+stampa(1_000_000);
+stampa(3.1415926535);
 stampa(nullo);
 stampa(vero);
 stampa(falso);

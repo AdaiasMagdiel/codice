@@ -5,6 +5,7 @@ namespace App\Parser;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
+use App\Ast\FloatLiteral;
 use App\Enums\TokenType;
 use App\Interfaces\Expr;
 use App\Interfaces\Stmt;
@@ -12,6 +13,7 @@ use App\Lexer\Token;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\Identifier;
+use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
 use App\Exceptions\ParseError;
 
@@ -112,8 +114,16 @@ class Parser
             return new BoolLiteral($this->consume());
         }
 
+        if ($this->check(TokenType::INT)) {
+            return new IntLiteral($this->consume());
+        }
+
+        if ($this->check(TokenType::FLOAT)) {
+            return new FloatLiteral($this->consume());
+        }
+
         throw new ParseError(
-            "Atteso un valore (String, Identifier o CallExpr).",
+            "Atteso un valore (stringa, identificatore o chiamata di funzione).",
             $this->peek()->loc
         );
     }

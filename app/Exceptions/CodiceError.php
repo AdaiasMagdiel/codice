@@ -12,6 +12,8 @@ class CodiceError extends Exception
     private const string RED = "\033[31m";
     private const string RESET = "\033[0m";
 
+    public const string UNTERMINATED_STRING = "Stringa non terminata.";
+
     public Loc $loc;
 
     public function __construct(string $message, Loc $loc)

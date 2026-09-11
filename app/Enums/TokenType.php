@@ -8,6 +8,8 @@ enum TokenType
 	case STRING;
 	case NULL;
 	case BOOL;
+	case INT;
+	case FLOAT;
 
 	case SEMICOLON;
 	case LEFT_PAREN;

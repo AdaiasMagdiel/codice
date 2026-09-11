@@ -3,6 +3,7 @@
 namespace App\Lexer;
 
 use App\Enums\TokenType;
+use App\Exceptions\CodiceError;
 use App\Exceptions\LexError;
 
 class Scanner
@@ -87,20 +88,24 @@ class Scanner
 		return substr($this->content, $start, $this->pos - $start);
 	}
 
-	private function extractString(): string|false
+	private function extractString(Loc $loc): string
 	{
+		$start = $this->pos;
 		$this->consume();
 		$chars = [];
 
 		while (true) {
+
 			if ($this->isAtEnd()) {
-				return false;
+				$loc->length = $this->pos - $start;
+				throw new LexError(CodiceError::UNTERMINATED_STRING, $loc);
 			}
 
 			$ch = $this->peek();
 
 			if ($ch === "\n") {
-				return false;
+				$loc->length = $this->pos - $start;
+				throw new LexError(CodiceError::UNTERMINATED_STRING, $loc);
 			}
 
 			if ($ch === '"') {
@@ -112,7 +117,8 @@ class Scanner
 				$this->consume();
 
 				if ($this->isAtEnd()) {
-					return false;
+					$loc->length = $this->pos - $start;
+					throw new LexError(CodiceError::UNTERMINATED_STRING, $loc);
 				}
 
 				$escaped = $this->consume();
@@ -136,10 +142,59 @@ class Scanner
 			$chars[] = $this->consume();
 		}
 
+		$loc->length = $this->pos - $start;
+
 		return implode("", $chars);
 	}
 
-	public function scan(): array|false
+	private function extractNumber(Loc $loc): string
+	{
+		$start = $this->pos;
+		$isFloat = false;
+		$chars = [];
+
+		while (!$this->isAtEnd()) {
+			$ch = $this->peek();
+
+			if ($ch === '_') {
+				$this->consume();
+
+				if (!ctype_digit($this->peek())) {
+					$loc->length = $this->pos - $start;
+					throw new LexError("Atteso un numero dopo '_'.", $loc);
+				}
+
+				continue;
+			}
+
+			if ($ch === '.') {
+				if ($isFloat) break;
+
+				$isFloat = true;
+				$chars[] = $this->consume();
+
+				if ($this->peek() === '_') {
+					throw new LexError("Atteso un numero dopo il punto decimale, ma trovato '_'.", $loc);
+				}
+
+				continue;
+			}
+
+			if (!ctype_digit($ch)) break;
+
+			$chars[] = $this->consume();
+		}
+
+		$loc->length = $this->pos - $start;
+
+		if (count($chars) > 1 && $chars[0] === '0' && ctype_digit($chars[1])) {
+			throw new LexError("Numero non valido: zero iniziale non consentito.", $loc);
+		}
+
+		return implode("", $chars);
+	}
+
+	public function scan(): array
 	{
 		$tokens = [];
 
@@ -151,7 +206,7 @@ class Scanner
 				$this->consume();
 			}
 
-			// Symbols
+			// symbols
 			else if (($tokenType = Symbol::from($ch)) !== null) {
 				$tokens[] = new Token($tokenType, $ch, $this->getLoc());
 				$this->consume();
@@ -168,22 +223,29 @@ class Scanner
 				$tokens[] = new Token($tokenType, $lexeme, $loc);
 			}
 
-			// Strings
+			// strings
 			else if ($ch === '"') {
 				$loc = $this->getLoc();
-				$lexeme = $this->extractString();
+				$lexeme = $this->extractString($loc);
 
-				if ($lexeme === false) {
-					throw new LexError("String non terminata", $loc);
-				}
-
-				$loc->length = strlen($lexeme) + 2;
 				$tokens[] = new Token(TokenType::STRING, $lexeme, $loc);
+			}
+
+			// numbers
+			else if (($ch === '.' && ctype_digit($this->peek(1))) || ctype_digit($ch)) {
+				$loc = $this->getLoc();
+				$lexeme = $this->extractNumber($loc);
+
+				$isFloat = str_contains($lexeme, '.');
+				$type  = $isFloat ? TokenType::FLOAT : TokenType::INT;
+				$value = $isFloat ? (float) $lexeme : (int) $lexeme;
+
+				$tokens[] = new Token($type, $value, $loc);
 			}
 
 			// default
 			else {
-				throw new LexError("Valore inatteso '{$ch}'", $this->getLoc());
+				throw new LexError("Valore inatteso '{$ch}'.", $this->getLoc());
 			}
 		}
 

@@ -5,13 +5,17 @@ namespace App\Runtime;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
+use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
+use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Interfaces\Expr;
 use App\Interfaces\Stmt;
 use App\Types\Booleano;
+use App\Types\Decimale;
+use App\Types\Intero;
 use App\Types\Nullo;
 use App\Types\Stringa;
 use Exception;
@@ -59,6 +63,10 @@ class Interpreter
             return new Nullo();
         } else if ($expr instanceof BoolLiteral) {
             return new Booleano($expr->token->lexeme === 'vero');
+        } else if ($expr instanceof IntLiteral) {
+            return new Intero($expr->token->lexeme);
+        } else if ($expr instanceof FloatLiteral) {
+            return new Decimale($expr->token->lexeme);
         }
 
         $class = get_class($expr);
