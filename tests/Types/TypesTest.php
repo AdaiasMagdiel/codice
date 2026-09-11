@@ -47,3 +47,9 @@ it('converts a Decimale to its raw value', function () {
     expect($decimale)->toBeInstanceOf(Type::class)
         ->and((string) $decimale)->toBe('3.14');
 });
+
+it('converts a whole-number Decimale keeping the decimal point', function () {
+    $decimale = new Decimale(67.0);
+
+    expect((string) $decimale)->toBe('67.0');
+});
