@@ -1,0 +1,3 @@
+stampa(nullo);
+stampa(vero);
+stampa(falso);

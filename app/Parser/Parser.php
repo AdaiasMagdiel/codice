@@ -2,6 +2,7 @@
 
 namespace App\Parser;
 
+use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
 use App\Enums\TokenType;
@@ -11,6 +12,7 @@ use App\Lexer\Token;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\Identifier;
+use App\Ast\NullLiteral;
 use App\Exceptions\ParseError;
 
 class Parser
@@ -100,6 +102,14 @@ class Parser
             }
 
             return new Identifier($token);
+        }
+
+        if ($this->check(TokenType::NULL)) {
+            return new NullLiteral($this->consume());
+        }
+
+        if ($this->check(TokenType::BOOL)) {
+            return new BoolLiteral($this->consume());
         }
 
         throw new ParseError(

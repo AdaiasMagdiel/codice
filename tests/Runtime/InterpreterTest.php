@@ -41,7 +41,28 @@ it('calls a builtin function with multiple arguments concatenated', function () 
 });
 
 it('calls a builtin function with a nested call expression as argument', function () {
-    expect(runInterpreterSource('stampa(stampa("ciao"));'))->toBe("ciao" . PHP_EOL . PHP_EOL);
+    expect(runInterpreterSource('stampa(stampa("ciao"));'))->toBe("ciao" . PHP_EOL . "nullo" . PHP_EOL);
+});
+
+it('evaluates the true boolean literal', function () {
+    expect(runInterpreterSource('stampa(vero);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates the false boolean literal', function () {
+    expect(runInterpreterSource('stampa(falso);'))->toBe("falso" . PHP_EOL);
+});
+
+it('evaluates the null literal', function () {
+    expect(runInterpreterSource('stampa(nullo);'))->toBe("nullo" . PHP_EOL);
+});
+
+it('prints multiple literal types together', function () {
+    expect(runInterpreterSource('stampa(vero, " ", falso, " ", nullo);'))
+        ->toBe("vero falso nullo" . PHP_EOL);
+});
+
+it('defaults a function call with no explicit return value to nullo', function () {
+    expect(runInterpreterSource('stampa(stampa());'))->toBe(PHP_EOL . "nullo" . PHP_EOL);
 });
 
 it('runs multiple statements in order', function () {

@@ -6,6 +6,8 @@ enum TokenType
 {
 	case IDENTIFIER;
 	case STRING;
+	case NULL;
+	case BOOL;
 
 	case SEMICOLON;
 	case LEFT_PAREN;

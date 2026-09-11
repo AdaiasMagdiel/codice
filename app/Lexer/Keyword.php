@@ -6,7 +6,11 @@ use App\Enums\TokenType;
 
 class Keyword
 {
-	private static array $keywords = [];
+	private static array $keywords = [
+		"nullo" => TokenType::NULL,
+		"vero"  => TokenType::BOOL,
+		"falso" => TokenType::BOOL
+	];
 
 	public static function from(string $value): ?TokenType
 	{

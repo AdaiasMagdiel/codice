@@ -3,13 +3,15 @@ Program        ::= { Statement } ;
 Statement      ::= ExprStatement ;
 ExprStatement  ::= Expression , ";" ;
 
-Expression ::= StringLiteral | CallExpr | Identifier ;
+Expression ::= StringLiteral | CallExpr | Identifier | NullLiteral | BoolLiteral ;
 
 CallExpr       ::= Identifier , "(" , [ ArgumentList ] , ")" ;
 ArgumentList   ::= Expression , { "," , Expression } ;
 
 Identifier     ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
 StringLiteral  ::= '"' , { StringCharacter } , '"' ;
+NullLiteral    ::= "nullo" ;
+BoolLiteral    ::= "vero" | "falso" ;
 
 Letter         ::= "a" | ... | "z" | "A" | ... | "Z" ;
 Digit          ::= "0" | ... | "9" ;
