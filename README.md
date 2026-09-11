@@ -40,12 +40,22 @@ Ciao, mondo!
 Ciao!
 ```
 
-Type `esci` (or press Ctrl+D) to exit. Each statement runs immediately
+Type `esci` (or press Ctrl+C) to exit. Each statement runs immediately
 against the same environment, so state carries over between lines.
 
 ## Grammar
 
 The current grammar is defined in [grammar.ebnf](grammar.ebnf).
+
+### Decimal separator
+
+Italian, like most languages, normally writes decimal numbers with a comma
+(`3,14`). Codice uses a period instead (`3.14`). This isn't just to follow
+the common programming convention — it also avoids ambiguity in contexts
+where a comma is already a separator, such as argument lists (`stampa(3,14)`
+would otherwise be indistinguishable from a two-argument call). The textual
+representation of numbers keeps the period as well, even though a comma
+would be the linguistically correct choice in Italian.
 
 ## Status
 
@@ -54,11 +64,12 @@ Early and experimental. Nothing here should be considered stable or production-r
 The pipeline runs end to end now: the lexer tokenizes source code, the
 parser builds an AST from it, and a tree-walking interpreter executes that
 AST directly. Values are represented by a small runtime type system
-(`App\Types`): `stringa` (string), `booleano` (`vero`/`falso`), and `nullo`
-(null — also the default return value of any function call). Beyond
-literals, identifiers, and function calls — `stampa` (print) is the only
-builtin — there are no variables, no control flow, and no user-defined
-functions yet.
+(`App\Types`): `stringa` (string), `booleano` (`vero`/`falso`), `nullo`
+(null — also the default return value of any function call), `intero`
+(integer) and `decimale` (float, using `.` as the decimal separator — see
+[Decimal separator](#decimal-separator)). Beyond literals, identifiers, and
+function calls — `stampa` (print) is the only builtin — there are no
+variables, no control flow, and no user-defined functions yet.
 
 ## Tests
 
