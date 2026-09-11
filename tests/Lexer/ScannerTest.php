@@ -68,19 +68,84 @@ it('keeps unknown escape sequences verbatim', function () {
 
 it('throws when a string is not terminated before EOF', function () {
     scanLexerSource('"ciao');
-})->throws(LexError::class, 'String non terminata');
+})->throws(LexError::class, 'Stringa non terminata');
 
 it('throws when a string is not terminated before a newline', function () {
     scanLexerSource("\"ciao\n\"");
-})->throws(LexError::class, 'String non terminata');
+})->throws(LexError::class, 'Stringa non terminata');
 
 it('throws when a string ends right after a trailing backslash', function () {
     scanLexerSource('"ciao\\');
-})->throws(LexError::class, 'String non terminata');
+})->throws(LexError::class, 'Stringa non terminata');
 
 it('throws on an unexpected character', function () {
     scanLexerSource('@');
 })->throws(LexError::class, "Valore inatteso '@'");
+
+it('scans an integer literal', function () {
+    $tokens = scanLexerSource('42');
+
+    expect($tokens[0]->type)->toBe(TokenType::INT)
+        ->and($tokens[0]->lexeme)->toBe(42)
+        ->and($tokens[0]->loc->length)->toBe(2);
+});
+
+it('scans an integer literal with underscores as digit separators', function () {
+    $tokens = scanLexerSource('1_000_000');
+
+    expect($tokens[0]->type)->toBe(TokenType::INT)
+        ->and($tokens[0]->lexeme)->toBe(1000000)
+        ->and($tokens[0]->loc->length)->toBe(9);
+});
+
+it('scans a float literal', function () {
+    $tokens = scanLexerSource('3.1415926535');
+
+    expect($tokens[0]->type)->toBe(TokenType::FLOAT)
+        ->and($tokens[0]->lexeme)->toBe(3.1415926535)
+        ->and($tokens[0]->loc->length)->toBe(12);
+});
+
+it('scans a float literal starting with a leading dot', function () {
+    $tokens = scanLexerSource('.5');
+
+    expect($tokens[0]->type)->toBe(TokenType::FLOAT)
+        ->and($tokens[0]->lexeme)->toBe(0.5);
+});
+
+it('scans a float literal with underscores in the fractional part', function () {
+    $tokens = scanLexerSource('1.5_5');
+
+    expect($tokens[0]->type)->toBe(TokenType::FLOAT)
+        ->and($tokens[0]->lexeme)->toBe(1.55);
+});
+
+it('throws when a number has two consecutive underscores', function () {
+    scanLexerSource('1__2');
+})->throws(LexError::class, "Atteso un numero dopo '_'.");
+
+it('throws when a number ends with a trailing underscore', function () {
+    scanLexerSource('12_');
+})->throws(LexError::class, "Atteso un numero dopo '_'.");
+
+it('throws when an underscore follows the decimal point directly', function () {
+    scanLexerSource('1._5');
+})->throws(LexError::class, "Atteso un numero dopo il punto decimale, ma trovato '_'.");
+
+it('throws on a number with a leading zero', function () {
+    scanLexerSource('012');
+})->throws(LexError::class, 'Numero non valido: zero iniziale non consentito.');
+
+it('does not treat a lone zero as a leading zero', function () {
+    $tokens = scanLexerSource('0');
+
+    expect($tokens[0]->type)->toBe(TokenType::INT)
+        ->and($tokens[0]->lexeme)->toBe(0);
+});
+
+it('throws when a leading zero is followed by an underscore and a digit', function () {
+    scanLexerSource('0_1');
+})->throws(LexError::class, 'Numero non valido: zero iniziale non consentito.');
 
 it('tracks line and column across newlines', function () {
     $tokens = scanLexerSource("\n saluto");

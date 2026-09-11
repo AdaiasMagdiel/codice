@@ -61,6 +61,18 @@ it('prints multiple literal types together', function () {
         ->toBe("vero falso nullo" . PHP_EOL);
 });
 
+it('evaluates an integer literal', function () {
+    expect(runInterpreterSource('stampa(42);'))->toBe("42" . PHP_EOL);
+});
+
+it('evaluates an integer literal with underscores as digit separators', function () {
+    expect(runInterpreterSource('stampa(1_000_000);'))->toBe("1000000" . PHP_EOL);
+});
+
+it('evaluates a float literal', function () {
+    expect(runInterpreterSource('stampa(3.1415926535);'))->toBe("3.1415926535" . PHP_EOL);
+});
+
 it('defaults a function call with no explicit return value to nullo', function () {
     expect(runInterpreterSource('stampa(stampa());'))->toBe(PHP_EOL . "nullo" . PHP_EOL);
 });

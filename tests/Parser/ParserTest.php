@@ -2,7 +2,9 @@
 
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
+use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
+use App\Ast\IntLiteral;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Exceptions\ParseError;
@@ -50,6 +52,20 @@ it('parses an identifier expression statement', function () {
         ->and($program->statements[0]->expr->token->lexeme)->toBe('saluto');
 });
 
+it('parses an integer literal expression statement', function () {
+    $program = parseParserSource('42;');
+
+    expect($program->statements[0]->expr)->toBeInstanceOf(IntLiteral::class)
+        ->and($program->statements[0]->expr->token->lexeme)->toBe(42);
+});
+
+it('parses a float literal expression statement', function () {
+    $program = parseParserSource('3.14;');
+
+    expect($program->statements[0]->expr)->toBeInstanceOf(FloatLiteral::class)
+        ->and($program->statements[0]->expr->token->lexeme)->toBe(3.14);
+});
+
 it('parses a call expression without arguments', function () {
     $program = parseParserSource('saluta();');
     $expr = $program->statements[0]->expr;
@@ -88,7 +104,7 @@ it('reports a parse error when a semicolon is missing', function () {
 
 it('reports a parse error when an expression is missing', function () {
     parseParserSource(';');
-})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
+})->throws(ParseError::class, 'Atteso un valore (stringa, identificatore o chiamata di funzione).');
 
 it('parses multiple statements in a single program', function () {
     $program = parseParserSource('saluto; saluta();');
@@ -100,7 +116,7 @@ it('parses multiple statements in a single program', function () {
 
 it('reports a parse error when an empty call is missing the closing parenthesis', function () {
     parseParserSource('saluta(');
-})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
+})->throws(ParseError::class, 'Atteso un valore (stringa, identificatore o chiamata di funzione).');
 
 it('reports a parse error when a call with arguments is missing the closing parenthesis', function () {
     parseParserSource('saluta("ciao"');
@@ -108,4 +124,4 @@ it('reports a parse error when a call with arguments is missing the closing pare
 
 it('reports a parse error on a trailing comma in an argument list', function () {
     parseParserSource('saluta("ciao",);');
-})->throws(ParseError::class, 'Atteso un valore (String, Identifier o CallExpr).');
+})->throws(ParseError::class, 'Atteso un valore (stringa, identificatore o chiamata di funzione).');

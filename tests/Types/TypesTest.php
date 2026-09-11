@@ -1,6 +1,8 @@
 <?php
 
 use App\Types\Booleano;
+use App\Types\Decimale;
+use App\Types\Intero;
 use App\Types\Nullo;
 use App\Types\Stringa;
 use App\Types\Type;
@@ -30,4 +32,18 @@ it('converts a Nullo to "nullo"', function () {
 
     expect($nullo)->toBeInstanceOf(Type::class)
         ->and((string) $nullo)->toBe('nullo');
+});
+
+it('converts an Intero to its raw value', function () {
+    $intero = new Intero(42);
+
+    expect($intero)->toBeInstanceOf(Type::class)
+        ->and((string) $intero)->toBe('42');
+});
+
+it('converts a Decimale to its raw value', function () {
+    $decimale = new Decimale(3.14);
+
+    expect($decimale)->toBeInstanceOf(Type::class)
+        ->and((string) $decimale)->toBe('3.14');
 });
