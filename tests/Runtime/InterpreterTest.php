@@ -194,6 +194,46 @@ it('throws when referencing an undefined identifier', function () {
     runInterpreterSource('sconosciuto;');
 })->throws(RuntimeError::class, "Identificatore 'sconosciuto' non definito.");
 
+it('declares a variable with an initial value', function () {
+    expect(runInterpreterSource('sia x = 5; stampa(x);'))->toBe("5" . PHP_EOL);
+});
+
+it('defaults a variable declared without an initial value to nullo', function () {
+    expect(runInterpreterSource('sia x; stampa(x);'))->toBe("nullo" . PHP_EOL);
+});
+
+it('evaluates a variable declaration to the assigned value', function () {
+    expect(runInterpreterSource('stampa(sia x = 5);'))->toBe("5" . PHP_EOL);
+});
+
+it('evaluates a variable declaration used inside a larger expression', function () {
+    expect(runInterpreterSource('stampa((sia x = 5) + 1);'))->toBe("6" . PHP_EOL);
+});
+
+it('keeps a variable declared inside a parenthesized expression available afterwards', function () {
+    expect(runInterpreterSource('sia y = (sia x = 5) * 2; stampa(x, " ", y);'))->toBe("5 10" . PHP_EOL);
+});
+
+it('throws when declaring a variable that is already declared', function () {
+    runInterpreterSource('sia x = 1; sia x = 2;');
+})->throws(RuntimeError::class, "L'identificatore 'x' è già stato dichiarato.");
+
+it('throws when the outer declaration of a self-nested "sia x = sia x = ..." redeclares x', function () {
+    // The inner "sia x = 5" runs first and declares x; the outer declaration
+    // then tries to declare the same name again and fails.
+    runInterpreterSource('sia x = sia x = 5;');
+})->throws(RuntimeError::class, "L'identificatore 'x' è già stato dichiarato.");
+
+it('throws when a variable declaration reuses the name of a builtin function', function () {
+    // Variables and builtin functions share the same namespace in Environment,
+    // so declaring "stampa" as a variable collides with the builtin.
+    runInterpreterSource('sia stampa = 5;');
+})->throws(RuntimeError::class, "L'identificatore 'stampa' è già stato dichiarato.");
+
+it('propagates an error raised while evaluating a variable declaration\'s initializer', function () {
+    runInterpreterSource('sia x = 1 / 0;');
+})->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
+
 it('throws when calling something that is not a function', function () {
     $environment = new Environment();
     $environment->globals['naoFuncao'] = 'valor';
