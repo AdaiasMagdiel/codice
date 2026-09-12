@@ -20,6 +20,9 @@ enum TokenType
 	case MINUS;
 	case STAR;
 	case SLASH;
+	case ASSIGN;
+
+	case SIA;
 
 	case EOF;
 }

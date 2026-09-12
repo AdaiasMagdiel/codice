@@ -14,7 +14,8 @@ class Symbol
         "+" => TokenType::PLUS,
         "-" => TokenType::MINUS,
         "*" => TokenType::STAR,
-        "/" => TokenType::SLASH
+        "/" => TokenType::SLASH,
+        "=" => TokenType::ASSIGN
     ];
 
     public static function from(string $value): ?TokenType

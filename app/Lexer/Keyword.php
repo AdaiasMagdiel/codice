@@ -9,7 +9,8 @@ class Keyword
 	private static array $keywords = [
 		"nullo" => TokenType::NULL,
 		"vero"  => TokenType::BOOL,
-		"falso" => TokenType::BOOL
+		"falso" => TokenType::BOOL,
+		"sia"	=> TokenType::SIA
 	];
 
 	public static function from(string $value): ?TokenType
