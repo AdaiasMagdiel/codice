@@ -1,6 +1,8 @@
 <?php
 
+use App\Exceptions\DivisionByZeroError;
 use App\Exceptions\RuntimeError;
+use App\Exceptions\TypeError;
 use App\Lexer\Scanner;
 use App\Parser\Parser;
 use App\Runtime\Environment;
@@ -71,6 +73,90 @@ it('evaluates an integer literal with underscores as digit separators', function
 
 it('evaluates a float literal', function () {
     expect(runInterpreterSource('stampa(3.1415926535);'))->toBe("3.1415926535" . PHP_EOL);
+});
+
+it('evaluates a unary plus on an integer', function () {
+    expect(runInterpreterSource('stampa(+42);'))->toBe("42" . PHP_EOL);
+});
+
+it('evaluates a unary minus on an integer', function () {
+    expect(runInterpreterSource('stampa(-42);'))->toBe("-42" . PHP_EOL);
+});
+
+it('evaluates nested unary minus expressions', function () {
+    expect(runInterpreterSource('stampa(-(-7));'))->toBe("7" . PHP_EOL);
+});
+
+it('throws a type error when applying unary minus to a non-numeric value', function () {
+    runInterpreterSource('stampa(-vero);');
+})->throws(TypeError::class, 'Atteso intero o decimale, ma trovato booleano.');
+
+it('evaluates binary addition between integers', function () {
+    expect(runInterpreterSource('stampa(1 + 2);'))->toBe("3" . PHP_EOL);
+});
+
+it('evaluates binary addition producing a float when either operand is a float', function () {
+    expect(runInterpreterSource('stampa(2.5 + 1);'))->toBe("3.5" . PHP_EOL);
+});
+
+it('concatenates strings with the plus operator', function () {
+    expect(runInterpreterSource('stampa("ciao" + " mondo");'))->toBe("ciao mondo" . PHP_EOL);
+});
+
+it('concatenates a string with a number using the plus operator', function () {
+    expect(runInterpreterSource('stampa("valore: " + 42);'))->toBe("valore: 42" . PHP_EOL);
+});
+
+it('evaluates binary subtraction between integers', function () {
+    expect(runInterpreterSource('stampa(10 - 3);'))->toBe("7" . PHP_EOL);
+});
+
+it('throws a type error when subtracting a string', function () {
+    runInterpreterSource('stampa("a" - 1);');
+})->throws(TypeError::class, 'Atteso intero o decimale, ma trovato stringa.');
+
+it('evaluates binary multiplication between integers', function () {
+    expect(runInterpreterSource('stampa(4 * 3);'))->toBe("12" . PHP_EOL);
+});
+
+it('repeats a string when multiplied by an integer', function () {
+    expect(runInterpreterSource('stampa("ab" * 3);'))->toBe("ababab" . PHP_EOL);
+});
+
+it('repeats a string when an integer multiplies it from the left', function () {
+    expect(runInterpreterSource('stampa(3 * "ab");'))->toBe("ababab" . PHP_EOL);
+});
+
+it('throws a type error when multiplying two strings', function () {
+    runInterpreterSource('stampa("a" * "b");');
+})->throws(TypeError::class, "Operatore '*' non applicabile a due stringhe.");
+
+it('throws a type error when multiplying a string by a float', function () {
+    runInterpreterSource('stampa("a" * 2.5);');
+})->throws(TypeError::class, "Operatore '*' non applicabile tra stringa e decimale.");
+
+it('throws a type error when multiplying a string by a negative integer', function () {
+    runInterpreterSource('stampa("a" * -1);');
+})->throws(TypeError::class, 'Il moltiplicatore della stringa non può essere negativo.');
+
+it('evaluates binary division between integers as a float', function () {
+    expect(runInterpreterSource('stampa(10 / 4);'))->toBe("2.5" . PHP_EOL);
+});
+
+it('evaluates an evenly divisible division as a float with a decimal point', function () {
+    expect(runInterpreterSource('stampa(10 / 5);'))->toBe("2.0" . PHP_EOL);
+});
+
+it('throws when dividing by zero', function () {
+    runInterpreterSource('stampa(10 / 0);');
+})->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
+
+it('gives multiplication higher precedence than addition', function () {
+    expect(runInterpreterSource('stampa(2 + 3 * 4);'))->toBe("14" . PHP_EOL);
+});
+
+it('lets parentheses override operator precedence', function () {
+    expect(runInterpreterSource('stampa((2 + 3) * 4);'))->toBe("20" . PHP_EOL);
 });
 
 it('defaults a function call with no explicit return value to nullo', function () {
