@@ -2,10 +2,4 @@
 
 namespace App\Ast;
 
-use App\Interfaces\Expr;
-use App\Lexer\Token;
-
-class FloatLiteral implements Expr
-{
-    public function __construct(public Token $token) {}
-}
+class FloatLiteral extends Literal {}

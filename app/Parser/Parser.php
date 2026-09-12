@@ -237,7 +237,7 @@ class Parser
 
         $this->expect(TokenType::RIGHT_PAREN);
 
-        return new CallExpr($identifier, $arguments, $identifier->loc);
+        return new CallExpr($identifier, $arguments);
     }
 
     private function parseArgumentList(): array
