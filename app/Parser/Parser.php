@@ -107,7 +107,7 @@ class Parser
         $this->expect(TokenType::SIA);
 
         $identifier = $this->expect(TokenType::IDENTIFIER);
-        $value = new NullLiteral();
+        $value = new NullLiteral(new Token(TokenType::NULL, "nullo", $identifier->loc));
 
         if ($this->check(TokenType::ASSIGN)) {
             $this->consume();
