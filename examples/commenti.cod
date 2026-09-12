@@ -1,0 +1,12 @@
+// Questo è un commento a riga singola.
+
+# Oppure puoi usare # al posto di //
+
+/*
+Un commento multilinea
+si fa così.
+*/
+
+stampa("Ciao!"); // I commenti possono stare anche dopo il codice.
+
+stampa /* si può anche mettere un commento qui in mezzo */ ("Arrivederci!");
