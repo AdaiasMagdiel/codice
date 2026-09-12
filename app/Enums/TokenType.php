@@ -16,5 +16,10 @@ enum TokenType
 	case RIGHT_PAREN;
 	case COMMA;
 
+	case PLUS;
+	case MINUS;
+	case STAR;
+	case SLASH;
+
 	case EOF;
 }

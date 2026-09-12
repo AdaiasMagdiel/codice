@@ -1,0 +1,9 @@
+stampa("Somma: ", 1 + 2);
+stampa("Sottrazione: ", 10 - 3);
+stampa("Moltiplicazione: ", 4 * 3);
+stampa("Divisione: ", 10 / 4);
+stampa("Precedenza: ", 2 + 3 * 4);
+stampa("Parentesi: ", (2 + 3) * 4);
+stampa("Meno unario: ", -(-7));
+stampa("Concatenazione: ", "ciao" + " mondo");
+stampa("Ripetizione: ", "ab" * 3);

@@ -2,6 +2,7 @@
 
 namespace App\Parser;
 
+use App\Ast\BinaryExpr;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
@@ -15,6 +16,7 @@ use App\Ast\StringLiteral;
 use App\Ast\Identifier;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
+use App\Ast\UnaryExpr;
 use App\Exceptions\ParseError;
 
 class Parser
@@ -84,13 +86,53 @@ class Parser
 
     private function parseExprStatement(): Stmt
     {
-        $expr = $this->parseExpression();
+        $expr = $this->parseAdditiveExpression();
         $this->expect(TokenType::SEMICOLON);
 
         return new ExprStatement($expr);
     }
 
-    private function parseExpression(): Expr
+    private function parseAdditiveExpression(): Expr
+    {
+        $expr = $this->parseMultiplicativeExpression();
+
+        while ($this->check(TokenType::PLUS) || $this->check(TokenType::MINUS)) {
+            $op = $this->consume();
+            $right = $this->parseMultiplicativeExpression();
+
+            $expr = new BinaryExpr($expr, $op, $right);
+        }
+
+        return $expr;
+    }
+
+    private function parseMultiplicativeExpression(): Expr
+    {
+        $expr = $this->parseUnaryExpression();
+
+        while ($this->check(TokenType::STAR) || $this->check(TokenType::SLASH)) {
+            $op = $this->consume();
+            $right = $this->parseUnaryExpression();
+
+            $expr = new BinaryExpr($expr, $op, $right);
+        }
+
+        return $expr;
+    }
+
+    private function parseUnaryExpression(): Expr
+    {
+        if ($this->check(TokenType::PLUS) || $this->check(TokenType::MINUS)) {
+            $op = $this->consume();
+            $right = $this->parsePrimaryExpression();
+
+            return new UnaryExpr($op, $right);
+        }
+
+        return $this->parsePrimaryExpression();
+    }
+
+    private function parsePrimaryExpression(): Expr
     {
         if ($this->check(TokenType::STRING)) {
             return new StringLiteral($this->consume());
@@ -122,8 +164,17 @@ class Parser
             return new FloatLiteral($this->consume());
         }
 
+        if ($this->check(TokenType::LEFT_PAREN)) {
+            $this->consume();
+
+            $expr = $this->parseAdditiveExpression();
+            $this->expect(TokenType::RIGHT_PAREN);
+
+            return $expr;
+        }
+
         throw new ParseError(
-            "Atteso un valore (stringa, identificatore o chiamata di funzione).",
+            "Atteso un valore.",
             $this->peek()->loc
         );
     }
@@ -144,11 +195,11 @@ class Parser
 
     private function parseArgumentList(): array
     {
-        $arguments = [$this->parseExpression()];
+        $arguments = [$this->parseAdditiveExpression()];
 
         while ($this->check(TokenType::COMMA)) {
             $this->consume();
-            $arguments[] = $this->parseExpression();
+            $arguments[] = $this->parseAdditiveExpression();
         }
 
         return $arguments;
