@@ -63,7 +63,13 @@ class Scanner
 
 	private function peek(int $offset = 0): string
 	{
-		return $this->content[$this->pos + $offset];
+		$index = $this->pos + $offset;
+
+		if ($index < 0 || $index >= $this->length) {
+			return "";
+		}
+
+		return $this->content[$index];
 	}
 
 	private function currentChar(): string
