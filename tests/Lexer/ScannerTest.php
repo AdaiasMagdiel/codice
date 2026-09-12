@@ -46,6 +46,28 @@ it('scans an identifier', function () {
         ->and($tokens[0]->loc->length)->toBe(8);
 });
 
+it('scans an identifier with multibyte UTF-8 characters', function () {
+    $tokens = scanLexerSource('condição');
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('condição')
+        ->and($tokens[0]->loc->length)->toBe(strlen('condição'));
+});
+
+it('scans an identifier starting with a multibyte UTF-8 character', function () {
+    $tokens = scanLexerSource('área');
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('área');
+});
+
+it('tracks columns by character, not by byte, across multibyte identifiers', function () {
+    $tokens = scanLexerSource('condição x');
+
+    expect($tokens[1]->lexeme)->toBe('x')
+        ->and($tokens[1]->loc->col)->toBe(10);
+});
+
 it('scans a plain string literal', function () {
     $tokens = scanLexerSource('"ciao"');
 
@@ -66,6 +88,12 @@ it('keeps unknown escape sequences verbatim', function () {
     expect($tokens[0]->lexeme)->toBe('ciao\z');
 });
 
+it('scans a string literal containing multibyte UTF-8 characters', function () {
+    $tokens = scanLexerSource('"È vero, così è!"');
+
+    expect($tokens[0]->lexeme)->toBe('È vero, così è!');
+});
+
 it('throws when a string is not terminated before EOF', function () {
     scanLexerSource('"ciao');
 })->throws(LexError::class, 'Stringa non terminata');
@@ -81,6 +109,16 @@ it('throws when a string ends right after a trailing backslash', function () {
 it('throws on an unexpected character', function () {
     scanLexerSource('@');
 })->throws(LexError::class, "Valore inatteso '@'");
+
+it('treats any non-ASCII byte as part of an identifier, even non-letters like symbols', function () {
+    // The lexer has no full Unicode letter table, so it can't tell an accented
+    // letter apart from a symbol like '€' based on byte value alone: any byte
+    // >= 0x80 is accepted as an identifier character.
+    $tokens = scanLexerSource('€');
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('€');
+});
 
 it('scans an integer literal', function () {
     $tokens = scanLexerSource('42');

@@ -41,6 +41,16 @@ class Scanner
 		$this->col = 1;
 	}
 
+	private function utf8CharLength(string $byte): int
+	{
+		$ord = ord($byte);
+		if ($ord < 0x80) return 1;        	  // 0xxxxxxx
+		if (($ord & 0xE0) === 0xC0) return 2; // 110xxxxx
+		if (($ord & 0xF0) === 0xE0) return 3; // 1110xxxx
+		if (($ord & 0xF8) === 0xF0) return 4; // 11110xxx
+		return 1; // invalid/continuation byte, fallback
+	}
+
 	private function isAtEnd(): bool
 	{
 		return $this->pos >= $this->length;
@@ -56,9 +66,15 @@ class Scanner
 		return $this->content[$this->pos + $offset];
 	}
 
+	private function currentChar(): string
+	{
+		$len = $this->utf8CharLength($this->peek());
+		return substr($this->content, $this->pos, $len);
+	}
+
 	private function consume(): string
 	{
-		$ch = $this->peek();
+		$ch = $this->currentChar();
 
 		if ($ch === "\n") {
 			$this->line++;
@@ -67,7 +83,7 @@ class Scanner
 			$this->col++;
 		}
 
-		$this->pos++;
+		$this->pos += strlen($ch);
 		return $ch;
 	}
 
@@ -78,7 +94,9 @@ class Scanner
 		while (!$this->isAtEnd()) {
 			$ch = $this->peek();
 
-			if ($ch !== '_' && !ctype_alnum($ch)) {
+			// bytes >= 0x80 belong to a multibyte UTF-8 character (e.g. accented
+			// letters); ctype_alnum() only understands ASCII, so it can't classify them.
+			if ($ch !== '_' && !ctype_alnum($ch) && ord($ch) < 0x80) {
 				break;
 			}
 
@@ -212,8 +230,8 @@ class Scanner
 				$this->consume();
 			}
 
-			// identifiers and keywords
-			else if ($ch === '_' || ctype_alpha($ch)) {
+			// identifiers and keywords (bytes >= 0x80 are multibyte letters, e.g. accented characters)
+			else if ($ch === '_' || ctype_alpha($ch) || ord($ch) >= 0x80) {
 				$loc = $this->getLoc();
 				$lexeme = $this->extractIdentifierOrKeyword();
 				$loc->length = strlen($lexeme);
@@ -245,7 +263,7 @@ class Scanner
 
 			// default
 			else {
-				throw new LexError("Valore inatteso '{$ch}'.", $this->getLoc());
+				throw new LexError("Valore inatteso '{$this->currentChar()}'.", $this->getLoc());
 			}
 		}
 
