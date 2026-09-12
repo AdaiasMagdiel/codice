@@ -1,34 +1,40 @@
 Program         ::= { Statement } ;
 
 Statement       ::= ExprStatement ;
-ExprStatement   ::= AdditiveExpr , ";" ;
+
+ExprStatement   ::= Expression , ";" ;
+
+Expression      ::= VarDeclExpr | AssignExpr | AdditiveExpr ;
+
+VarDeclExpr     ::= "sia" , Identifier , [ "=" , Expression ] ;
+AssignExpr      ::= Identifier , "=" , Expression ;
 
 AdditiveExpr    ::= MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
-
 MultiplicativeExpr ::= UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
-
 UnaryExpr       ::= [ UnaryOperator ] , PrimaryExpr ;
-
 UnaryOperator   ::= "-" | "+" ;
 
-PrimaryExpr     ::= StringLiteral 
-                  | CallExpr 
-                  | Identifier 
+PrimaryExpr     ::= CallExpr
+                  | Identifier
+                  | Literal
+                  | "(" , Expression , ")" ;
+
+Literal         ::= StringLiteral
                   | NullLiteral 
                   | BoolLiteral 
                   | FloatLiteral 
-                  | IntLiteral 
-                  | "(" , AdditiveExpr , ")" ;
+                  | IntLiteral ;
 
 CallExpr        ::= Identifier , "(" , [ ArgumentList ] , ")" ;
-ArgumentList    ::= AdditiveExpr , { "," , AdditiveExpr } ;
+ArgumentList    ::= Expression , { "," , Expression } ;
 
 Identifier      ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
 StringLiteral   ::= '"' , { StringCharacter } , '"' ;
 NullLiteral     ::= "nullo" ;
 BoolLiteral     ::= "vero" | "falso" ;
 IntLiteral      ::= "0" | ( NonZeroDigit , DigitGroup ) ;
-FloatLiteral    ::= IntLiteral , "." , [ Digit , DigitGroup ] ;
+FloatLiteral    ::= ( IntLiteral , "." , [ Digit , DigitGroup ] )
+                  | ( "." , Digit , DigitGroup ) ;
 
 Letter          ::= "a".."z" | "A".."Z" ;
 NonZeroDigit    ::= "1".."9" ;
