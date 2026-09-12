@@ -1,0 +1,25 @@
+// "sia" dichiara una variabile, opzionalmente con un valore iniziale.
+sia nome = "Codice";
+sia versione = 1;
+
+stampa("Ciao da " + nome + "! Versione: " + versione);
+
+// Senza valore iniziale, la variabile riceve "nullo".
+sia non_inizializzata;
+stampa("Variabile non inizializzata: ", non_inizializzata);
+
+// Le variabili possono essere usate in espressioni aritmetiche.
+sia a = 5;
+sia b = 10;
+sia somma = a + b;
+
+stampa("La somma di " + a + " e " + b + " è: " + somma);
+
+// "sia" è anche un'espressione: restituisce il valore appena assegnato,
+// quindi può comparire ovunque sia atteso un valore, come un argomento.
+stampa("Il doppio della somma è: ", sia doppio = somma * 2);
+
+// La dichiarazione avviene comunque, anche dentro un'espressione più grande:
+// "x" resta disponibile dopo, con il valore che le è stato assegnato.
+stampa("(sia x = 5) * 2 fa: ", (sia x = 5) * 2);
+stampa("E x è rimasta dichiarata con il valore: ", x);
