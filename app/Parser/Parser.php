@@ -17,6 +17,7 @@ use App\Ast\Identifier;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
 use App\Ast\UnaryExpr;
+use App\Ast\VarDeclExpr;
 use App\Exceptions\ParseError;
 
 class Parser
@@ -86,10 +87,34 @@ class Parser
 
     private function parseExprStatement(): Stmt
     {
-        $expr = $this->parseAdditiveExpression();
+        $expr = $this->parseExpression();
         $this->expect(TokenType::SEMICOLON);
 
         return new ExprStatement($expr);
+    }
+
+    private function parseExpression(): Expr
+    {
+        if ($this->check(TokenType::SIA)) {
+            return $this->parseVarDeclExpr();
+        }
+
+        return $this->parseAdditiveExpression();
+    }
+
+    private function parseVarDeclExpr(): Expr
+    {
+        $this->expect(TokenType::SIA);
+
+        $identifier = $this->expect(TokenType::IDENTIFIER);
+        $value = new NullLiteral();
+
+        if ($this->check(TokenType::ASSIGN)) {
+            $this->consume();
+            $value = $this->parseExpression();
+        }
+
+        return new VarDeclExpr(new Identifier($identifier), $value);
     }
 
     private function parseAdditiveExpression(): Expr
@@ -167,7 +192,7 @@ class Parser
         if ($this->check(TokenType::LEFT_PAREN)) {
             $this->consume();
 
-            $expr = $this->parseAdditiveExpression();
+            $expr = $this->parseExpression();
             $this->expect(TokenType::RIGHT_PAREN);
 
             return $expr;
@@ -195,11 +220,11 @@ class Parser
 
     private function parseArgumentList(): array
     {
-        $arguments = [$this->parseAdditiveExpression()];
+        $arguments = [$this->parseExpression()];
 
         while ($this->check(TokenType::COMMA)) {
             $this->consume();
-            $arguments[] = $this->parseAdditiveExpression();
+            $arguments[] = $this->parseExpression();
         }
 
         return $arguments;
