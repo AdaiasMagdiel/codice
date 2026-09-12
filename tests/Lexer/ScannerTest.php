@@ -37,6 +37,69 @@ it('scans every symbol token', function () {
         ->and($tokens[4]->type)->toBe(TokenType::EOF);
 });
 
+it('skips a hash line comment up to the newline', function () {
+    $tokens = scanLexerSource("# comment\nsaluto");
+
+    expect($tokens)->toHaveCount(2)
+        ->and($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('saluto');
+});
+
+it('skips a slash-slash line comment up to the newline', function () {
+    $tokens = scanLexerSource("// comment\nsaluto");
+
+    expect($tokens)->toHaveCount(2)
+        ->and($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('saluto');
+});
+
+it('treats a line comment reaching EOF without a trailing newline as valid', function () {
+    $tokens = scanLexerSource("saluto // comment");
+
+    expect($tokens)->toHaveCount(2)
+        ->and($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[1]->type)->toBe(TokenType::EOF);
+});
+
+it('skips a block comment', function () {
+    $tokens = scanLexerSource('/* comment */ saluto');
+
+    expect($tokens)->toHaveCount(2)
+        ->and($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('saluto');
+});
+
+it('skips a block comment spanning multiple lines', function () {
+    $tokens = scanLexerSource("/* line 1\nline 2 */ saluto");
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->loc->line)->toBe(2);
+});
+
+it('skips an empty block comment', function () {
+    $tokens = scanLexerSource('/**/saluto');
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('saluto');
+});
+
+it('does not let the opening "/*" double as the closing "*/"', function () {
+    // A naive scanner could let the '*' that opens the comment also serve as
+    // the '*' that closes it, wrongly treating "/*/" as a terminated comment.
+    scanLexerSource('/*/');
+})->throws(LexError::class, 'Commento non terminato');
+
+it('throws when a block comment is not terminated before EOF', function () {
+    scanLexerSource('/* comment');
+})->throws(LexError::class, 'Commento non terminato');
+
+it('treats one comment right after another as two separate comments', function () {
+    $tokens = scanLexerSource("/* a */// b\nsaluto");
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('saluto');
+});
+
 it('scans an identifier', function () {
     $tokens = scanLexerSource('saluto_1');
 
