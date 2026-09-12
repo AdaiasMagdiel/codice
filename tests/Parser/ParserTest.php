@@ -6,9 +6,11 @@ use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
 use App\Ast\IntLiteral;
+use App\Ast\NullLiteral;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\UnaryExpr;
+use App\Ast\VarDeclExpr;
 use App\Enums\TokenType;
 use App\Exceptions\ParseError;
 use App\Lexer\Scanner;
@@ -213,3 +215,59 @@ it('reports a parse error when a call with arguments is missing the closing pare
 it('reports a parse error on a trailing comma in an argument list', function () {
     parseParserSource('saluta("ciao",);');
 })->throws(ParseError::class, 'Atteso un valore.');
+
+it('parses a variable declaration without an initial value', function () {
+    $program = parseParserSource('sia x;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(VarDeclExpr::class)
+        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(NullLiteral::class);
+});
+
+it('parses a variable declaration with an initial value', function () {
+    $program = parseParserSource('sia x = 42;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(VarDeclExpr::class)
+        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(IntLiteral::class)
+        ->and($expr->value->token->lexeme)->toBe(42);
+});
+
+it('parses a variable declaration nested as another declaration\'s value', function () {
+    $program = parseParserSource('sia x = sia y = 5;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(VarDeclExpr::class)
+        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(VarDeclExpr::class)
+        ->and($expr->value->identifier->token->lexeme)->toBe('y');
+});
+
+it('parses a variable declaration used as a call argument', function () {
+    $program = parseParserSource('stampa(sia x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->args[0])->toBeInstanceOf(VarDeclExpr::class);
+});
+
+it('parses a variable declaration inside parentheses', function () {
+    $program = parseParserSource('(sia x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(VarDeclExpr::class);
+});
+
+it('reports a parse error when a variable declaration is missing the identifier', function () {
+    parseParserSource('sia = 5;');
+})->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'ASSIGN'.");
+
+it('reports a parse error when a variable declaration uses a reserved word as its name', function () {
+    parseParserSource('sia vero = 5;');
+})->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'BOOL'.");
+
+it('reports a parse error when a variable declaration has no identifier at all', function () {
+    parseParserSource('sia;');
+})->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'SEMICOLON'.");
