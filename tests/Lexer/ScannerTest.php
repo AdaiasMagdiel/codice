@@ -100,6 +100,16 @@ it('treats one comment right after another as two separate comments', function (
         ->and($tokens[0]->lexeme)->toBe('saluto');
 });
 
+it('allows a block comment between two other tokens', function () {
+    $tokens = scanLexerSource('stampa /* comment */ (saluto)');
+
+    expect($tokens)->toHaveCount(5)
+        ->and($tokens[0]->lexeme)->toBe('stampa')
+        ->and($tokens[1]->type)->toBe(TokenType::LEFT_PAREN)
+        ->and($tokens[2]->lexeme)->toBe('saluto')
+        ->and($tokens[3]->type)->toBe(TokenType::RIGHT_PAREN);
+});
+
 it('scans an identifier', function () {
     $tokens = scanLexerSource('saluto_1');
 
