@@ -16,7 +16,15 @@
     "type": "git",
     "url": "git+https://github.com/AdaiasMagdiel/codice.git"
   },
-  "keywords": [],
+  "keywords": [
+    "programming-language",
+    "language-design",
+    "interpreter",
+    "lexer",
+    "parser",
+    "italian",
+    "php"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {

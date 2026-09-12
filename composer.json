@@ -2,6 +2,15 @@
     "name": "adaiasmagdiel/codice",
     "description": "A small programming language with Italian keywords, built for learning language design and the Italian language.",
     "type": "project",
+    "keywords": [
+        "programming-language",
+        "language-design",
+        "interpreter",
+        "lexer",
+        "parser",
+        "italian",
+        "php"
+    ],
     "license": "GPL-3.0-only",
     "autoload": {
         "psr-4": {
