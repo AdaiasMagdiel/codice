@@ -5,6 +5,7 @@ namespace App\Runtime;
 use App\Ast\Identifier;
 use App\Exceptions\RuntimeError;
 use App\Lexer\Loc;
+use App\Lexer\Token;
 
 class Environment
 {
@@ -19,39 +20,42 @@ class Environment
         ];
     }
 
-    public function getIdentifier(Identifier $identifier)
+    public function get(Token $identifier)
     {
-        $key = $identifier->token->lexeme;
+        $key = $identifier->lexeme;
 
         if (!array_key_exists($key, $this->globals)) {
             throw new RuntimeError(
                 "Identificatore '{$key}' non definito.",
-                $identifier->token->loc
+                $identifier->loc
             );
         }
 
-        return $this->globals[$identifier->token->lexeme];
+        return $this->globals[$key];
     }
 
-    public function getFunction(string $callee, Loc $loc)
+    public function define(Token $identifier, mixed $value)
     {
-        $fn = $this->globals[$callee] ?? null;
-
-        if (!is_callable($fn)) {
-            throw new RuntimeError("Atteso che '{$callee}' fosse una funzione.", $loc);
-        }
-
-        return $fn;
-    }
-
-    public function setIdentifier(Identifier $identifier, mixed $value)
-    {
-        $key = $identifier->token->lexeme;
+        $key = $identifier->lexeme;
 
         if (array_key_exists($key, $this->globals)) {
             throw new RuntimeError(
                 "L'identificatore '{$key}' è già stato dichiarato.",
-                $identifier->token->loc
+                $identifier->loc
+            );
+        }
+
+        $this->globals[$key] = $value;
+    }
+
+    public function assign(Token $identifier, mixed $value)
+    {
+        $key = $identifier->lexeme;
+
+        if (!array_key_exists($key, $this->globals)) {
+            throw new RuntimeError(
+                "Identificatore '{$key}' non definito.",
+                $identifier->loc
             );
         }
 

@@ -161,7 +161,7 @@ it('parses a call expression without arguments', function () {
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(CallExpr::class)
-        ->and($expr->callee)->toBe('saluta')
+        ->and($expr->callee->lexeme)->toBe('saluta')
         ->and($expr->args)->toBe([]);
 });
 
@@ -170,7 +170,7 @@ it('parses a call expression with arguments', function () {
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(CallExpr::class)
-        ->and($expr->callee)->toBe('saluta')
+        ->and($expr->callee->lexeme)->toBe('saluta')
         ->and($expr->args)->toHaveCount(2)
         ->and($expr->args[0])->toBeInstanceOf(StringLiteral::class)
         ->and($expr->args[0]->token->lexeme)->toBe('ciao')
@@ -182,10 +182,10 @@ it('parses nested call expressions as arguments', function () {
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(CallExpr::class)
-        ->and($expr->callee)->toBe('scrivi')
+        ->and($expr->callee->lexeme)->toBe('scrivi')
         ->and($expr->args)->toHaveCount(1)
         ->and($expr->args[0])->toBeInstanceOf(CallExpr::class)
-        ->and($expr->args[0]->callee)->toBe('formatta');
+        ->and($expr->args[0]->callee->lexeme)->toBe('formatta');
 });
 
 it('reports a parse error when a semicolon is missing', function () {
@@ -221,7 +221,7 @@ it('parses a variable declaration without an initial value', function () {
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(VarDeclExpr::class)
-        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->identifier->lexeme)->toBe('x')
         ->and($expr->value)->toBeInstanceOf(NullLiteral::class);
 });
 
@@ -230,7 +230,7 @@ it('parses a variable declaration with an initial value', function () {
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(VarDeclExpr::class)
-        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->identifier->lexeme)->toBe('x')
         ->and($expr->value)->toBeInstanceOf(IntLiteral::class)
         ->and($expr->value->token->lexeme)->toBe(42);
 });
@@ -240,9 +240,9 @@ it('parses a variable declaration nested as another declaration\'s value', funct
     $expr = $program->statements[0]->expr;
 
     expect($expr)->toBeInstanceOf(VarDeclExpr::class)
-        ->and($expr->identifier->token->lexeme)->toBe('x')
+        ->and($expr->identifier->lexeme)->toBe('x')
         ->and($expr->value)->toBeInstanceOf(VarDeclExpr::class)
-        ->and($expr->value->identifier->token->lexeme)->toBe('y');
+        ->and($expr->value->identifier->lexeme)->toBe('y');
 });
 
 it('parses a variable declaration used as a call argument', function () {

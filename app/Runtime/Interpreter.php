@@ -16,6 +16,7 @@ use App\Ast\UnaryExpr;
 use App\Ast\VarDeclExpr;
 use App\Enums\TokenType;
 use App\Exceptions\DivisionByZeroError;
+use App\Exceptions\RuntimeError;
 use App\Exceptions\TypeError;
 use App\Interfaces\Expr;
 use App\Interfaces\Stmt;
@@ -78,7 +79,7 @@ class Interpreter
         }
 
         $class = get_class($statement);
-        throw new Exception("Istruzione inattesa '{$class}'.");
+        throw new Exception("Istruzione inattesa '{$class}'.\n");
     }
 
     private function runExprStatement(Expr $expr)
@@ -90,7 +91,15 @@ class Interpreter
     {
         // functions
         if ($expr instanceof CallExpr) {
-            $fn = $this->environment->getFunction($expr->callee, $expr->loc);
+            $fn = $this->environment->get($expr->callee);
+
+            if (!is_callable($fn)) {
+                throw new RuntimeError(
+                    "Atteso che '{$expr->callee->lexeme}' fosse una funzione.",
+                    $expr->callee->loc
+                );
+            }
+
             $return = $fn(...array_map($this->runExpression(...), $expr->args));
 
             return is_null($return) ? new Nullo() : $return;
@@ -99,7 +108,7 @@ class Interpreter
         // variable declaration
         else if ($expr instanceof VarDeclExpr) {
             $value = $this->runExpression($expr->value);
-            $this->environment->setIdentifier($expr->identifier, $value);
+            $this->environment->define($expr->identifier, $value);
 
             return $value;
         }
@@ -111,7 +120,7 @@ class Interpreter
 
         // identificators
         else if ($expr instanceof Identifier) {
-            return $this->environment->getIdentifier($expr);
+            return $this->environment->get($expr->token);
         }
 
         // null
@@ -150,7 +159,7 @@ class Interpreter
                     return $right;
 
                 default:
-                    throw new Exception("Operatore unario '{$op->lexeme}' non implementato.");
+                    throw new Exception("Operatore unario '{$op->lexeme}' non implementato.\n");
             }
         }
 
@@ -237,6 +246,6 @@ class Interpreter
         }
 
         $class = get_class($expr);
-        throw new Exception("Espressione inattesa '{$class}'.");
+        throw new Exception("Espressione inattesa '{$class}'.\n");
     }
 }

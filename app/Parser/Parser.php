@@ -2,6 +2,7 @@
 
 namespace App\Parser;
 
+use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
@@ -36,12 +37,17 @@ class Parser
 
     private function isAtEnd(): bool
     {
-        return $this->pos >= $this->tokensCount || $this->peek()->type === TokenType::EOF;
+        return $this->pos >= $this->tokensCount || $this->tokens[$this->pos]->type === TokenType::EOF;
     }
 
-    private function peek(): Token
+    private function peek(int $offset = 0): Token
     {
-        return $this->tokens[$this->pos];
+        if ($this->isAtEnd()) {
+            $loc = $this->tokens[$this->tokensCount - 1]->loc;
+            return new Token(TokenType::EOF, null, $loc);
+        }
+
+        return $this->tokens[$this->pos + $offset];
     }
 
     private function consume(): Token
@@ -52,9 +58,9 @@ class Parser
         return $token;
     }
 
-    private function check(TokenType $type): bool
+    private function check(TokenType $type, int $offset = 0): bool
     {
-        return $this->peek()->type === $type;
+        return $this->peek($offset)->type === $type;
     }
 
     private function expect(TokenType $type): Token
@@ -99,6 +105,13 @@ class Parser
             return $this->parseVarDeclExpr();
         }
 
+        if (
+            $this->check(TokenType::IDENTIFIER) &&
+            $this->check(TokenType::ASSIGN, 1)
+        ) {
+            return $this->parseAssignExpr();
+        }
+
         return $this->parseAdditiveExpression();
     }
 
@@ -114,7 +127,16 @@ class Parser
             $value = $this->parseExpression();
         }
 
-        return new VarDeclExpr(new Identifier($identifier), $value);
+        return new VarDeclExpr($identifier, $value);
+    }
+
+    private function parseAssignExpr(): Expr
+    {
+        $identifier = $this->expect(TokenType::IDENTIFIER);
+        $this->expect(TokenType::ASSIGN);
+        $value = $this->parseExpression();
+
+        return new AssignExpr($identifier, $value);
     }
 
     private function parseAdditiveExpression(): Expr
@@ -215,7 +237,7 @@ class Parser
 
         $this->expect(TokenType::RIGHT_PAREN);
 
-        return new CallExpr($identifier->lexeme, $arguments, $identifier->loc);
+        return new CallExpr($identifier, $arguments, $identifier->loc);
     }
 
     private function parseArgumentList(): array

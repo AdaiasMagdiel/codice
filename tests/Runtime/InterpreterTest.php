@@ -188,7 +188,7 @@ it('resolves an identifier bound in the environment', function () {
 
 it('throws when calling an undefined function', function () {
     runInterpreterSource('saluta();');
-})->throws(RuntimeError::class, "Atteso che 'saluta' fosse una funzione.");
+})->throws(RuntimeError::class, "Identificatore 'saluta' non definito.");
 
 it('throws when referencing an undefined identifier', function () {
     runInterpreterSource('sconosciuto;');

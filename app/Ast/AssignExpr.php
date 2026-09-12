@@ -5,7 +5,7 @@ namespace App\Ast;
 use App\Interfaces\Expr;
 use App\Lexer\Token;
 
-class VarDeclExpr implements Expr
+class AssignExpr implements Expr
 {
     public function __construct(
         public Token $identifier,
