@@ -4,6 +4,7 @@ export default defineConfig({
   lang: 'en-US',
   title: 'Codice',
   description: 'A small programming language with Italian keywords.',
+  base: '/codice/',
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
