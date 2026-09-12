@@ -72,28 +72,43 @@ class Scanner
 		return $this->content[$index];
 	}
 
+	private function match(string $value): bool
+	{
+		if ($this->pos + strlen($value) > $this->length) {
+			return false;
+		}
+
+		return substr_compare($this->content, $value, $this->pos, strlen($value)) === 0;
+	}
+
 	private function currentChar(): string
 	{
 		$len = $this->utf8CharLength($this->peek());
 		return substr($this->content, $this->pos, $len);
 	}
 
-	private function consume(): string
+	private function consume(int $times = 1): string
 	{
-		$ch = $this->currentChar();
+		$result = "";
 
-		if ($ch === "\n") {
-			$this->line++;
-			$this->col = 1;
-		} else {
-			$this->col++;
+		for ($i = 0; $i < $times; $i++) {
+			$ch = $this->currentChar();
+
+			if ($ch === "\n") {
+				$this->line++;
+				$this->col = 1;
+			} else {
+				$this->col++;
+			}
+
+			$this->pos += strlen($ch);
+			$result .= $ch;
 		}
 
-		$this->pos += strlen($ch);
-		return $ch;
+		return $result;
 	}
 
-	private function extractIdentifierOrKeyword(): string
+	private function extractIdentifier(): string
 	{
 		$start = $this->pos;
 
@@ -218,6 +233,34 @@ class Scanner
 		return implode("", $chars);
 	}
 
+	private function skipComment(): void
+	{
+		$loc = $this->getLoc();
+
+		if ($this->match("/*")) {
+			$this->consume(2);
+
+			while (true) {
+				if ($this->isAtEnd()) {
+					throw new LexError(CodiceError::UNTERMINATED_COMMENT, $loc);
+				}
+
+				if ($this->match("*/")) {
+					$this->consume(2);
+					break;
+				}
+
+				$this->consume();
+			}
+		} else if ($this->peek() === '#' || $this->match("//")) {
+			while (!$this->isAtEnd()) {
+				if ($this->peek() === "\n") break;
+
+				$this->consume();
+			}
+		}
+	}
+
 	public function scan(): array
 	{
 		$tokens = [];
@@ -230,6 +273,11 @@ class Scanner
 				$this->consume();
 			}
 
+			// comments
+			else if ($ch === "#" || $this->match("//") || $this->match("/*")) {
+				$this->skipComment();
+			}
+
 			// symbols
 			else if (($tokenType = Symbol::from($ch)) !== null) {
 				$tokens[] = new Token($tokenType, $ch, $this->getLoc());
@@ -239,7 +287,7 @@ class Scanner
 			// identifiers and keywords (bytes >= 0x80 are multibyte letters, e.g. accented characters)
 			else if ($ch === '_' || ctype_alpha($ch) || ord($ch) >= 0x80) {
 				$loc = $this->getLoc();
-				$lexeme = $this->extractIdentifierOrKeyword();
+				$lexeme = $this->extractIdentifier();
 				$loc->length = strlen($lexeme);
 
 				$tokenType = Keyword::from($lexeme) ?? TokenType::IDENTIFIER;

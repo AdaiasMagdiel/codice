@@ -13,6 +13,7 @@ class CodiceError extends Exception
     private const string RESET = "\033[0m";
 
     public const string UNTERMINATED_STRING = "Stringa non terminata.";
+    public const string UNTERMINATED_COMMENT = "Commento non terminato.";
 
     public Loc $loc;
 
