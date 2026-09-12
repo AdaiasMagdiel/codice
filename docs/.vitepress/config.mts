@@ -1,9 +1,9 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  lang: 'it',
+  lang: 'en-US',
   title: 'Codice',
-  description: 'Un piccolo linguaggio di programmazione con parole chiave in italiano.',
+  description: 'A small programming language with Italian keywords.',
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
@@ -14,29 +14,29 @@ export default defineConfig({
     siteTitle: 'Codice',
 
     nav: [
-      { text: 'Guida', link: '/guida/introduzione', activeMatch: '/guida/' },
-      { text: 'Esempi', link: '/esempi', activeMatch: '/esempi' },
+      { text: 'Guide', link: '/guide/introduction', activeMatch: '/guide/' },
+      { text: 'Examples', link: '/examples', activeMatch: '/examples' },
       { text: 'REPL', link: '/repl', activeMatch: '/repl' },
     ],
 
     sidebar: {
-      '/guida/': [
+      '/guide/': [
         {
-          text: 'Introduzione',
+          text: 'Introduction',
           items: [
-            { text: "Cos'è Codice?", link: '/guida/introduzione' },
-            { text: 'Installazione', link: '/guida/installazione' },
-            { text: 'Il REPL', link: '/guida/repl' },
+            { text: 'What is Codice?', link: '/guide/introduction' },
+            { text: 'Installation', link: '/guide/installation' },
+            { text: 'The REPL', link: '/guide/repl' },
           ],
         },
         {
-          text: 'Il Linguaggio',
+          text: 'The Language',
           items: [
-            { text: 'Tipi primitivi', link: '/guida/tipi' },
-            { text: 'Variabili', link: '/guida/variabili' },
-            { text: 'Operazioni matematiche', link: '/guida/operazioni' },
-            { text: 'Stringhe', link: '/guida/stringhe' },
-            { text: 'Funzioni built-in', link: '/guida/builtin' },
+            { text: 'Primitive types', link: '/guide/types' },
+            { text: 'Variables', link: '/guide/variables' },
+            { text: 'Math operations', link: '/guide/operations' },
+            { text: 'Strings', link: '/guide/strings' },
+            { text: 'Built-in functions', link: '/guide/builtin' },
           ],
         },
       ],
@@ -51,26 +51,17 @@ export default defineConfig({
     },
 
     footer: {
-      message: 'Rilasciato sotto licenza GPL-3.0.',
+      message: 'Released under the GPL-3.0 license.',
       copyright: 'Copyright © 2024 Adaías Magdiel',
     },
 
     editLink: {
       pattern: 'https://github.com/AdaiasMagdiel/codice/edit/main/docs/:path',
-      text: 'Modifica questa pagina su GitHub',
+      text: 'Edit this page on GitHub',
     },
 
     lastUpdated: {
-      text: 'Aggiornato il',
-    },
-
-    docFooter: {
-      prev: 'Precedente',
-      next: 'Successivo',
-    },
-
-    outline: {
-      label: 'In questa pagina',
+      text: 'Last updated',
     },
   },
 

@@ -3,24 +3,24 @@ layout: home
 
 hero:
   name: "Codice"
-  text: "Un linguaggio con l'anima italiana."
-  tagline: Progetto didattico per imparare a costruire un linguaggio di programmazione — e un po' di italiano lungo la strada.
+  text: "A programming language with an Italian soul."
+  tagline: A study project for learning how programming languages are built — and picking up some Italian along the way.
   actions:
     - theme: brand
-      text: Inizia a leggere
-      link: /guida/introduzione
+      text: Get started
+      link: /guide/introduction
     - theme: alt
-      text: Vedi su GitHub
+      text: View on GitHub
       link: https://github.com/AdaiasMagdiel/codice
 
 features:
   - icon: 🇮🇹
-    title: Parole chiave in italiano
-    details: "stampa, sia, vero, falso — ogni costrutto del linguaggio usa vocabolario italiano autentico."
+    title: Italian keywords
+    details: "stampa, sia, vero, falso — every language construct uses authentic Italian vocabulary."
   - icon: 🔬
-    title: Costruito per imparare
-    details: Lexer, parser e interprete scritti da zero in PHP. Nessuna libreria esterna, nessuna scorciatoia.
+    title: Built for learning
+    details: Lexer, parser and interpreter written from scratch in PHP. No external libraries, no shortcuts.
   - icon: ⚡
-    title: REPL interattivo
-    details: Esegui espressioni al volo. Ogni istruzione viene valutata immediatamente nello stesso ambiente.
+    title: Interactive REPL
+    details: Run expressions on the fly. Each statement is evaluated immediately in the same environment.
 ---
