@@ -1,0 +1,29 @@
+{
+  "name": "codice",
+  "version": "1.0.0",
+  "description": "Codice is a small programming language with keywords in Italian. It has no real-world ambition — it exists purely as a study project, a way to learn how programming languages are built (lexer, parser, interpreter) while also practicing Italian vocabulary along the way.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaiasMagdiel/codice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdaiasMagdiel/codice/issues"
+  },
+  "homepage": "https://github.com/AdaiasMagdiel/codice#readme",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

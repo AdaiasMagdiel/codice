@@ -2,3 +2,8 @@
 .phpunit.cache/
 .DS_Store
 .local/
+
+# Node
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
