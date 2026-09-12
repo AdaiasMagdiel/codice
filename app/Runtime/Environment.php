@@ -24,7 +24,10 @@ class Environment
         $key = $identifier->token->lexeme;
 
         if (!array_key_exists($key, $this->globals)) {
-            throw new RuntimeError("Identificatore '{$key}' non definito.", $identifier->token->loc);
+            throw new RuntimeError(
+                "Identificatore '{$key}' non definito.",
+                $identifier->token->loc
+            );
         }
 
         return $this->globals[$identifier->token->lexeme];
@@ -39,5 +42,19 @@ class Environment
         }
 
         return $fn;
+    }
+
+    public function setIdentifier(Identifier $identifier, mixed $value)
+    {
+        $key = $identifier->token->lexeme;
+
+        if (array_key_exists($key, $this->globals)) {
+            throw new RuntimeError(
+                "L'identificatore '{$key}' è già stato dichiarato.",
+                $identifier->token->loc
+            );
+        }
+
+        $this->globals[$key] = $value;
     }
 }

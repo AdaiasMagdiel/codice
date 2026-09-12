@@ -13,6 +13,7 @@ use App\Ast\NullLiteral;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\UnaryExpr;
+use App\Ast\VarDeclExpr;
 use App\Enums\TokenType;
 use App\Exceptions\DivisionByZeroError;
 use App\Exceptions\TypeError;
@@ -93,6 +94,14 @@ class Interpreter
             $return = $fn(...array_map($this->runExpression(...), $expr->args));
 
             return is_null($return) ? new Nullo() : $return;
+        }
+
+        // variable declaration
+        else if ($expr instanceof VarDeclExpr) {
+            $value = $this->runExpression($expr->value);
+            $this->environment->setIdentifier($expr->identifier, $value);
+
+            return $value;
         }
 
         // strings
