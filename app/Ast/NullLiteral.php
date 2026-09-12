@@ -7,5 +7,5 @@ use App\Lexer\Token;
 
 class NullLiteral implements Expr
 {
-    public function __construct(public Token $token) {}
+    public function __construct(public ?Token $token = null) {}
 }
