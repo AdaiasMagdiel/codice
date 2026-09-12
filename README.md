@@ -86,10 +86,27 @@ AST directly. Values are represented by a small runtime type system
 (`App\Types`): `stringa` (string), `booleano` (`vero`/`falso`), `nullo`
 (null — also the default return value of any function call), `intero`
 (integer) and `decimale` (float, using `.` as the decimal separator — see
-[Decimal separator](#decimal-separator)). Beyond literals, identifiers,
-function calls — `stampa` (print) is the only builtin — and arithmetic
-expressions (`+`, `-`, `*`, `/`, unary `+`/`-`), there are no variables, no
-control flow, and no user-defined functions yet.
+[Decimal separator](#decimal-separator)). Beyond literals, function calls —
+`stampa` (print) is the only builtin — and arithmetic expressions (`+`, `-`,
+`*`, `/`, unary `+`/`-`), variables are supported: `sia` declares one, and an
+already-declared one can be reassigned with `=`. Functions are values like
+any other, so they can be assigned to a variable and called through it. See
+[examples/assegnamento.cod](examples/assegnamento.cod):
+
+```sh
+$ php codice.php examples/assegnamento.cod
+Ciao da Codice! Versione: 1
+Variabile non inizializzata: nullo
+La somma di 5 e 10 è: 15
+Il doppio della somma è: 30
+(sia x = 5) * 2 fa: 10
+E x è rimasta dichiarata con il valore: 5
+Il contatore ora vale: 1
+Ora a e b valgono entrambi: 10 10
+Fantastico!
+```
+
+There is still no control flow and no user-defined functions yet.
 
 ## Tests
 

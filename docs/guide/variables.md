@@ -38,7 +38,7 @@ stampa(x / y);  // → 3.3333333333333
 
 ## Reassignment
 
-A variable can be reassigned with `=`, as long as the new value has the same type:
+A variable can be reassigned with `=` (no `sia` this time) after it has been declared:
 
 ```cod
 sia counter = 0;
@@ -46,8 +46,34 @@ counter = counter + 1;
 stampa(counter);  // → 1
 ```
 
-::: warning Fixed types
-A variable's type is set at declaration and cannot change. Assigning a value of a different type is an error.
+Like `sia`, `=` is itself an expression: it evaluates to the assigned value, so it can be chained to assign the same value to several variables at once.
+
+```cod
+sia a = 0;
+sia b = 0;
+a = b = 10;
+stampa(a, " ", b);  // → 10 10
+```
+
+::: warning Must be declared first
+`=` only reassigns — it never creates a variable. Assigning to an identifier that was never declared with `sia` is an error:
+
+```cod
+sconosciuta = 1;  // Errore: Identificatore 'sconosciuta' non definito.
+```
+
+There is also no fixed type: reassigning a value of a different type from the original one is allowed.
+:::
+
+Functions are values too, so a builtin like `stampa` can be assigned to a variable and called through it:
+
+```cod
+sia dire_ciao = stampa;
+dire_ciao("Fantastico!");  // → Fantastico!
+```
+
+::: warning Shadowing builtins
+Reassigning a builtin's name (`stampa = 5;`) succeeds — it just overwrites that name in the environment, like any other variable. Calling it afterwards fails, since the new value is no longer a function.
 :::
 
 ## Identifiers

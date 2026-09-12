@@ -23,3 +23,22 @@ stampa("Il doppio della somma è: ", sia doppio = somma * 2);
 // "x" resta disponibile dopo, con il valore che le è stato assegnato.
 stampa("(sia x = 5) * 2 fa: ", (sia x = 5) * 2);
 stampa("E x è rimasta dichiarata con il valore: ", x);
+
+// Una variabile già dichiarata può essere riassegnata con "=" (senza "sia").
+sia contatore = 0;
+contatore = contatore + 1;
+stampa("Il contatore ora vale: ", contatore);
+
+// Anche "=" è un'espressione: restituisce il valore assegnato, e può essere
+// incatenata, assegnando lo stesso valore a più variabili in una volta sola.
+// ("a" e "b" sono le stesse dichiarate più sopra.)
+a = b = 10;
+stampa("Ora a e b valgono entrambi: ", a, " ", b);
+
+// Riassegnare un identificatore mai dichiarato è un errore:
+// "sconosciuta = 1;" darebbe "Identificatore 'sconosciuta' non definito."
+
+// Le funzioni sono valori come un altro: si possono assegnare a una
+// variabile e poi chiamarle tramite quella variabile.
+sia dire_ciao = stampa;
+dire_ciao("Fantastico!");
