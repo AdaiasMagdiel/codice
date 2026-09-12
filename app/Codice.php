@@ -47,10 +47,6 @@ class Codice
 
 			readline_add_history($line);
 
-			if (!str_ends_with($line, ';')) {
-				$line .= ';';
-			}
-
 			$this->run('stdin', $line);
 		}
 	}

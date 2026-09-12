@@ -7,7 +7,7 @@ Written in PHP, it is deliberately simple and unfinished in places. Expect rough
 ## First program
 
 ```cod
-stampa("Ciao, mondo!")
+stampa("Ciao, mondo!");
 ```
 
 ```sh

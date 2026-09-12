@@ -12,10 +12,10 @@ php codice.php
 
 ```
 $ php codice.php
->>> stampa("Ciao, mondo!")
+>>> stampa("Ciao, mondo!");
 Ciao, mondo!
->>> sia x = 10
->>> stampa(x + 5)
+>>> sia x = 10;
+>>> stampa(x + 5);
 15
 >>> esci
 Ciao!
