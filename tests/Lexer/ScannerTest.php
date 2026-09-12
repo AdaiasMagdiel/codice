@@ -120,6 +120,20 @@ it('treats any non-ASCII byte as part of an identifier, even non-letters like sy
         ->and($tokens[0]->lexeme)->toBe('€');
 });
 
+it('scans a 4-byte UTF-8 character, such as an emoji', function () {
+    $tokens = scanLexerSource('😀');
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe('😀');
+});
+
+it('falls back to a single byte for an invalid/standalone UTF-8 byte', function () {
+    $tokens = scanLexerSource("\xFF");
+
+    expect($tokens[0]->type)->toBe(TokenType::IDENTIFIER)
+        ->and($tokens[0]->lexeme)->toBe("\xFF");
+});
+
 it('scans an integer literal', function () {
     $tokens = scanLexerSource('42');
 
