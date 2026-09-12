@@ -234,6 +234,42 @@ it('propagates an error raised while evaluating a variable declaration\'s initia
     runInterpreterSource('sia x = 1 / 0;');
 })->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
 
+it('reassigns a previously declared variable', function () {
+    expect(runInterpreterSource('sia x = 1; x = 2; stampa(x);'))->toBe("2" . PHP_EOL);
+});
+
+it('evaluates an assignment expression to the assigned value', function () {
+    expect(runInterpreterSource('sia x = 1; stampa(x = 5);'))->toBe("5" . PHP_EOL);
+});
+
+it('evaluates an assignment expression used inside a larger expression', function () {
+    expect(runInterpreterSource('sia x = 1; stampa((x = 5) + 1);'))->toBe("6" . PHP_EOL);
+});
+
+it('assigns the same value to every variable in a chained assignment', function () {
+    expect(runInterpreterSource('sia x = 0; sia y = 0; x = y = 5; stampa(x, " ", y);'))->toBe("5 5" . PHP_EOL);
+});
+
+it('throws when assigning to an identifier that was never declared', function () {
+    runInterpreterSource('x = 5;');
+})->throws(RuntimeError::class, "Identificatore 'x' non definito.");
+
+it('throws when assigning to an identifier declared only after the assignment', function () {
+    runInterpreterSource('x = 5; sia x = 1;');
+})->throws(RuntimeError::class, "Identificatore 'x' non definito.");
+
+it('allows reassigning the name of a builtin function, shadowing it', function () {
+    expect(fn () => runInterpreterSource('stampa = 5;'))->not->toThrow(RuntimeError::class);
+});
+
+it('throws when calling a builtin function after it was shadowed by an assignment', function () {
+    runInterpreterSource('stampa = 5; stampa(1);');
+})->throws(RuntimeError::class, "Atteso che 'stampa' fosse una funzione.");
+
+it('propagates an error raised while evaluating an assignment\'s value', function () {
+    runInterpreterSource('sia x = 1; x = 1 / 0;');
+})->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
+
 it('throws when calling something that is not a function', function () {
     $environment = new Environment();
     $environment->globals['naoFuncao'] = 'valor';

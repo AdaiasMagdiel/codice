@@ -2,6 +2,7 @@
 
 namespace App\Runtime;
 
+use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
@@ -109,6 +110,14 @@ class Interpreter
         else if ($expr instanceof VarDeclExpr) {
             $value = $this->runExpression($expr->value);
             $this->environment->define($expr->identifier, $value);
+
+            return $value;
+        }
+
+        // assignments
+        else if ($expr instanceof AssignExpr) {
+            $value = $this->runExpression($expr->value);
+            $this->environment->assign($expr->identifier, $value);
 
             return $value;
         }

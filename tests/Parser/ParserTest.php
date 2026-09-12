@@ -1,5 +1,6 @@
 <?php
 
+use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\CallExpr;
 use App\Ast\ExprStatement;
@@ -271,3 +272,61 @@ it('reports a parse error when a variable declaration uses a reserved word as it
 it('reports a parse error when a variable declaration has no identifier at all', function () {
     parseParserSource('sia;');
 })->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'SEMICOLON'.");
+
+it('parses an assignment expression', function () {
+    $program = parseParserSource('x = 5;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(AssignExpr::class)
+        ->and($expr->identifier->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(IntLiteral::class)
+        ->and($expr->value->token->lexeme)->toBe(5);
+});
+
+it('parses a chained assignment expression as right-associative', function () {
+    $program = parseParserSource('x = y = 5;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(AssignExpr::class)
+        ->and($expr->identifier->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(AssignExpr::class)
+        ->and($expr->value->identifier->lexeme)->toBe('y')
+        ->and($expr->value->value)->toBeInstanceOf(IntLiteral::class);
+});
+
+it('parses an assignment expression used as a call argument', function () {
+    $program = parseParserSource('stampa(x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->args[0])->toBeInstanceOf(AssignExpr::class);
+});
+
+it('parses an assignment expression inside parentheses', function () {
+    $program = parseParserSource('(x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(AssignExpr::class);
+});
+
+it('does not treat a call expression as an assignment', function () {
+    $program = parseParserSource('saluta();');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class);
+});
+
+it('does not treat a bare identifier as an assignment', function () {
+    $program = parseParserSource('x;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(Identifier::class);
+});
+
+it('reports a parse error when an assignment is missing its value', function () {
+    parseParserSource('x = ;');
+})->throws(ParseError::class, 'Atteso un valore.');
+
+it('reports a parse error when an assignment is missing its semicolon', function () {
+    parseParserSource('x = 5');
+})->throws(ParseError::class, "Atteso 'SEMICOLON', ma è stato trovato 'EOF'.");
