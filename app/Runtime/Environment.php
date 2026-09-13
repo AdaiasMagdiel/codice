@@ -2,23 +2,22 @@
 
 namespace App\Runtime;
 
-use App\Ast\Identifier;
 use App\Exceptions\RuntimeError;
-use App\Lexer\Loc;
 use App\Lexer\Token;
+use App\Types\Chiamabile;
 
 class Environment
 {
     public array $globals = [];
-    private array $constants = [];
+    public array $constants = [];
 
-    public function __construct()
+    public function __construct(public ?Environment $enclosing = null)
     {
-        $this->globals = [
-            "stampa" => function (...$args) {
+        if ($enclosing === null) {
+            $this->globals["stampa"] = new Chiamabile('stampa', function (...$args) {
                 echo implode("", $args) . PHP_EOL;
-            }
-        ];
+            });
+        }
     }
 
     public function has(Token $identifier): bool
@@ -28,14 +27,18 @@ class Environment
 
     public function get(Token $identifier)
     {
-        if (!$this->has($identifier)) {
-            throw new RuntimeError(
-                "Identificatore '{$identifier->lexeme}' non definito.",
-                $identifier->loc
-            );
+        if ($this->has($identifier)) {
+            return $this->globals[$identifier->lexeme];
         }
 
-        return $this->globals[$identifier->lexeme];
+        if ($this->enclosing !== null) {
+            return $this->enclosing->get($identifier);
+        }
+
+        throw new RuntimeError(
+            "Identificatore '{$identifier->lexeme}' non definito.",
+            $identifier->loc
+        );
     }
 
     public function define(Token $identifier, mixed $value)
@@ -58,20 +61,26 @@ class Environment
 
     public function assign(Token $identifier, mixed $value)
     {
-        if (!$this->has($identifier)) {
-            throw new RuntimeError(
-                "Identificatore '{$identifier->lexeme}' non definito.",
-                $identifier->loc
-            );
+        if ($this->has($identifier)) {
+            if (isset($this->constants[$identifier->lexeme])) {
+                throw new RuntimeError(
+                    "Impossibile riassegnare la costante '{$identifier->lexeme}'.",
+                    $identifier->loc
+                );
+            }
+
+            $this->globals[$identifier->lexeme] = $value;
+            return;
         }
 
-        if (isset($this->constants[$identifier->lexeme])) {
-            throw new RuntimeError(
-                "Impossibile riassegnare la costante '{$identifier->lexeme}'.",
-                $identifier->loc
-            );
+        if ($this->enclosing !== null) {
+            $this->enclosing->assign($identifier, $value);
+            return;
         }
 
-        $this->globals[$identifier->lexeme] = $value;
+        throw new RuntimeError(
+            "Identificatore '{$identifier->lexeme}' non definito.",
+            $identifier->loc
+        );
     }
 }

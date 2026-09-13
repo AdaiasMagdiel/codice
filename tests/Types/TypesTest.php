@@ -1,6 +1,7 @@
 <?php
 
 use App\Types\Booleano;
+use App\Types\Chiamabile;
 use App\Types\Decimale;
 use App\Types\Intero;
 use App\Types\Nullo;
@@ -52,4 +53,11 @@ it('converts a whole-number Decimale keeping the decimal point', function () {
     $decimale = new Decimale(67.0);
 
     expect((string) $decimale)->toBe('67.0');
+});
+
+it('converts a Chiamabile to a description with its name', function () {
+    $chiamabile = new Chiamabile('stampa', fn () => null);
+
+    expect($chiamabile)->toBeInstanceOf(Type::class)
+        ->and((string) $chiamabile)->toBe("<chiamabile 'stampa'>");
 });
