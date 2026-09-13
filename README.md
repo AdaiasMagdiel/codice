@@ -10,6 +10,8 @@ Written in PHP, it is deliberately simple and unfinished in places. Expect rough
 
 📖 **[Read the full documentation](https://adaiasmagdiel.github.io/codice/)** for a guided tour of the language — types, variables, conditionals, operations, strings, comments and built-ins.
 
+`.cod` files get syntax highlighting on GitHub via [AdaiasMagdiel/codice-syntax-highlight](https://github.com/AdaiasMagdiel/codice-syntax-highlight).
+
 ## Example
 
 ```
