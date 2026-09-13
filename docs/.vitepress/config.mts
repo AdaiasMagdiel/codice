@@ -75,7 +75,7 @@ export default defineConfig({
         scopeName: 'source.cod',
         grammar: {
           patterns: [
-            { match: '\\b(sia|stampa|vero|falso|nullo|esci)\\b', name: 'keyword.control.cod' },
+            { match: '\\b(sia|cost|stampa|vero|falso|nullo|esci)\\b', name: 'keyword.control.cod' },
             { match: '\\b(stringa|intero|decimale|booleano)\\b', name: 'storage.type.cod' },
             { match: '"[^"]*"', name: 'string.quoted.double.cod' },
             { match: '\\b\\d+(\\.\\d+)?\\b', name: 'constant.numeric.cod' },

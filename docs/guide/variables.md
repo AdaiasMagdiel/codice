@@ -1,6 +1,6 @@
 # Variables
 
-Variables in Codice are declared with the `sia` keyword, followed by an identifier and a value.
+Variables in Codice are declared with the `sia` keyword, followed by an identifier and a value. Constants use `cost` instead — see [Constants](#constants) below.
 
 ## Declaration
 
@@ -74,6 +74,33 @@ dire_ciao("Fantastico!");  // → Fantastico!
 
 ::: warning Shadowing builtins
 Reassigning a builtin's name (`stampa = 5;`) succeeds — it just overwrites that name in the environment, like any other variable. Calling it afterwards fails, since the new value is no longer a function.
+:::
+
+## Constants
+
+A constant is declared with `cost` instead of `sia`. Unlike `sia`, an initial value is required — there's no such thing as an uninitialized constant:
+
+```cod
+cost PI = 3.14159265358979323846;
+stampa(PI);  // → 3.1415926535898
+```
+
+Once declared, a constant can never be reassigned:
+
+```cod
+cost PI = 3.14;
+PI = 3;  // Errore: Impossibile riassegnare la costante 'PI'.
+```
+
+`sia` and `cost` share the same namespace, so redeclaring a name already taken by either one — including a builtin — is an error, regardless of which keyword is used the second time:
+
+```cod
+sia x = 1;
+cost x = 2;  // Errore: L'identificatore 'x' è già stato dichiarato.
+```
+
+::: tip
+Aside from being reassignable, a constant behaves exactly like a variable: it can appear in expressions, be passed as an argument, and even hold a function.
 :::
 
 ## Identifiers
