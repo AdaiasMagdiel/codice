@@ -88,13 +88,15 @@ AST directly. Values are represented by a small runtime type system
 (integer) and `decimale` (float, using `.` as the decimal separator — see
 [Decimal separator](#decimal-separator)). Beyond literals, function calls —
 `stampa` (print) is the only builtin — and arithmetic expressions (`+`, `-`,
-`*`, `/`, unary `+`/`-`), variables are supported: `sia` declares one, and an
-already-declared one can be reassigned with `=`. Functions are values like
-any other, so they can be assigned to a variable and called through it. See
-[examples/assegnamento.cod](examples/assegnamento.cod):
+`*`, `/`, unary `+`/`-`), variables and constants are supported: `sia`
+declares a variable, `cost` declares a constant (always requires an initial
+value, and can never be reassigned), and an already-declared variable can be
+reassigned with `=`. Functions are values like any other, so they can be
+assigned to a variable and called through it. See
+[examples/assegnamenti.cod](examples/assegnamenti.cod):
 
 ```sh
-$ php codice.php examples/assegnamento.cod
+$ php codice.php examples/assegnamenti.cod
 Ciao da Codice! Versione: 1
 Variabile non inizializzata: nullo
 La somma di 5 e 10 è: 15
@@ -104,6 +106,7 @@ E x è rimasta dichiarata con il valore: 5
 Il contatore ora vale: 1
 Ora a e b valgono entrambi: 10 10
 Fantastico!
+PI vale: 3.1415926535898
 ```
 
 There is still no control flow and no user-defined functions yet.

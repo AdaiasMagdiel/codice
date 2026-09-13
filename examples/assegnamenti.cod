@@ -42,3 +42,15 @@ stampa("Ora a e b valgono entrambi: ", a, " ", b);
 // variabile e poi chiamarle tramite quella variabile.
 sia dire_ciao = stampa;
 dire_ciao("Fantastico!");
+
+// "cost" dichiara una costante: richiede sempre un valore iniziale
+// (a differenza di "sia") e non può più essere riassegnata dopo.
+cost PI = 3.14159265358979323846;
+stampa("PI vale: ", PI);
+
+// Riassegnare una costante è un errore:
+// "PI = 3;" darebbe "Impossibile riassegnare la costante 'PI'."
+
+// Anche ridichiarare lo stesso nome, con "sia" o "cost", è un errore:
+// "cost PI = 3;" darebbe "L'identificatore 'PI' è già stato dichiarato."
+
