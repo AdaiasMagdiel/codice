@@ -1,0 +1,79 @@
+// "se" testa una condizione tra parentesi ed esegue il blocco quando è vera.
+se (vero) {
+	stampa("Questo blocco viene sempre eseguito.");
+}
+
+// "senon" esegue il proprio blocco quando la condizione è falsa.
+se (falso) {
+	stampa("Non vedrai mai questo messaggio.");
+} senon {
+	stampa("La condizione era falsa, quindi eseguo questo blocco.");
+}
+
+// Ogni tipo ha una propria regola di "verità" quando usato come condizione:
+// - Booleano: il proprio valore
+// - Intero:   falso solo se vale 0
+// - Decimale: falso solo se vale 0.0
+// - Stringa:  falso solo se è vuota ""
+// - Nullo:    sempre falso
+
+se (0) {
+	stampa("Non stampato: 0 è falso.");
+} senon {
+	stampa("0 è falso: entro nel ramo senon.");
+}
+
+se (1) {
+	stampa("1 è vero: qualsiasi intero diverso da zero lo è.");
+}
+
+se (0.0) {
+	stampa("Non stampato: 0.0 è falso.");
+} senon {
+	stampa("0.0 è falso, come 0.");
+}
+
+se ("") {
+	stampa("Non stampato: la stringa vuota è falsa.");
+} senon {
+	stampa("Una stringa vuota è falsa.");
+}
+
+se ("ciao") {
+	stampa("Una stringa non vuota è vera.");
+}
+
+se (nullo) {
+	stampa("Non stampato: nullo è sempre falso.");
+} senon {
+	stampa("nullo è sempre falso.");
+}
+
+// Si possono incatenare più condizioni con "senon se", proprio come un
+// if/else-if/else in altri linguaggi.
+se (falso) {
+	stampa("Non entra qui.");
+} senon se (falso) {
+	stampa("Nemmeno qui.");
+} senon se (vero) {
+	stampa("Entra in questo ramo, tramite 'senon se'.");
+} senon {
+	stampa("Non arriva mai qui: uno dei rami sopra era vero.");
+}
+
+// I blocchi possono essere annidati.
+se (vero) {
+	stampa("Fuori.");
+
+	se (vero) {
+		stampa("Dentro.");
+	}
+}
+
+// Ogni blocco ha il proprio scope: una variabile dichiarata con "sia"
+// dentro un blocco non esiste più fuori di esso.
+se (vero) {
+	sia segreto = "solo qui dentro";
+	stampa("Dentro il blocco: ", segreto);
+}
+// "stampa(segreto);" qui fuori darebbe "Identificatore 'segreto' non definito."

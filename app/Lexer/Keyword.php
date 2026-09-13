@@ -11,7 +11,9 @@ class Keyword
 		"vero"  => TokenType::BOOL,
 		"falso" => TokenType::BOOL,
 		"sia"	=> TokenType::SIA,
-		"cost"	=> TokenType::COST
+		"cost"	=> TokenType::COST,
+		"se"	=> TokenType::SE,
+		"senon" => TokenType::SENON
 	];
 
 	public static function from(string $value): ?TokenType

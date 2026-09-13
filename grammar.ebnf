@@ -1,8 +1,11 @@
 Program         ::= { Statement } ;
 
-Statement       ::= ExprStatement ;
+Statement       ::= IfStatement | Block | ExprStatement ;
 
 ExprStatement   ::= Expression , ";" ;
+IfStatement     ::= "se" , "(" , Expression , ")" , Block , [ "senon" , ( IfStatement | Block) ] ;
+
+Block           ::= "{" , { Statement } , "}" ;
 
 Expression      ::= VarDeclExpr | ConstDeclExpr | AssignExpr | AdditiveExpr ;
 

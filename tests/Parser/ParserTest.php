@@ -2,11 +2,14 @@
 
 use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
+use App\Ast\Block;
+use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ConstDeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
+use App\Ast\IfStatement;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
 use App\Ast\Program;
@@ -262,6 +265,10 @@ it('parses a variable declaration inside parentheses', function () {
     expect($expr)->toBeInstanceOf(VarDeclExpr::class);
 });
 
+it('reports a parse error when a variable declaration appears unparenthesized as an operand', function () {
+    parseParserSource('1 + sia x = 42;');
+})->throws(ParseError::class, 'Atteso un valore.');
+
 it('reports a parse error when a variable declaration is missing the identifier', function () {
     parseParserSource('sia = 5;');
 })->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'ASSIGN'.");
@@ -381,3 +388,73 @@ it('reports a parse error when an assignment is missing its value', function () 
 it('reports a parse error when an assignment is missing its semicolon', function () {
     parseParserSource('x = 5');
 })->throws(ParseError::class, "Atteso 'SEMICOLON', ma è stato trovato 'EOF'.");
+
+it('parses an empty block', function () {
+    $program = parseParserSource('{}');
+
+    expect($program->statements)->toHaveCount(1)
+        ->and($program->statements[0])->toBeInstanceOf(Block::class)
+        ->and($program->statements[0]->statements)->toBe([]);
+});
+
+it('parses a block with statements', function () {
+    $program = parseParserSource('{ 1; 2; }');
+    $block = $program->statements[0];
+
+    expect($block)->toBeInstanceOf(Block::class)
+        ->and($block->statements)->toHaveCount(2)
+        ->and($block->statements[0]->expr)->toBeInstanceOf(IntLiteral::class)
+        ->and($block->statements[1]->expr)->toBeInstanceOf(IntLiteral::class);
+});
+
+it('parses nested blocks', function () {
+    $program = parseParserSource('{ { 1; } }');
+    $outer = $program->statements[0];
+
+    expect($outer)->toBeInstanceOf(Block::class)
+        ->and($outer->statements)->toHaveCount(1)
+        ->and($outer->statements[0])->toBeInstanceOf(Block::class);
+});
+
+it('reports a parse error when a block is missing its closing brace', function () {
+    parseParserSource('{ 1;');
+})->throws(ParseError::class, "Atteso 'RIGHT_BRACE', ma è stato trovato 'EOF'.");
+
+it('parses an if statement without an else branch', function () {
+    $program = parseParserSource('se (vero) { 1; }');
+    $stmt = $program->statements[0];
+
+    expect($stmt)->toBeInstanceOf(IfStatement::class)
+        ->and($stmt->condition)->toBeInstanceOf(BoolLiteral::class)
+        ->and($stmt->then)->toBeInstanceOf(Block::class)
+        ->and($stmt->else)->toBeNull();
+});
+
+it('parses an if/else statement', function () {
+    $program = parseParserSource('se (vero) { 1; } senon { 2; }');
+    $stmt = $program->statements[0];
+
+    expect($stmt)->toBeInstanceOf(IfStatement::class)
+        ->and($stmt->else)->toBeInstanceOf(Block::class);
+});
+
+it('parses an if/else-if/else chain', function () {
+    $program = parseParserSource('se (vero) { 1; } senon se (falso) { 2; } senon { 3; }');
+    $stmt = $program->statements[0];
+
+    expect($stmt->else)->toBeInstanceOf(IfStatement::class)
+        ->and($stmt->else->condition)->toBeInstanceOf(BoolLiteral::class)
+        ->and($stmt->else->else)->toBeInstanceOf(Block::class);
+});
+
+it('reports a parse error when an if condition is missing its parentheses', function () {
+    parseParserSource('se vero { 1; }');
+})->throws(ParseError::class, "Atteso 'LEFT_PAREN', ma è stato trovato 'BOOL'.");
+
+it('reports a parse error for a dangling else with no matching if', function () {
+    parseParserSource('senon { 1; }');
+})->throws(ParseError::class, "'senon' senza un 'se' corrispondente.");
+
+it('reports a parse error for a dangling else inside a block', function () {
+    parseParserSource('{ senon { 1; } }');
+})->throws(ParseError::class, "'senon' senza un 'se' corrispondente.");

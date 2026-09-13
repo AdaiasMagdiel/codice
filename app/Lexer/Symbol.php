@@ -10,6 +10,8 @@ class Symbol
         ';' => TokenType::SEMICOLON,
         '(' => TokenType::LEFT_PAREN,
         ')' => TokenType::RIGHT_PAREN,
+        '{' => TokenType::LEFT_BRACE,
+        '}' => TokenType::RIGHT_BRACE,
         "," => TokenType::COMMA,
         "+" => TokenType::PLUS,
         "-" => TokenType::MINUS,

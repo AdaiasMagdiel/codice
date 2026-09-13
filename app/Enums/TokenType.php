@@ -11,10 +11,12 @@ enum TokenType
 	case INT;
 	case FLOAT;
 
+	case COMMA;
 	case SEMICOLON;
 	case LEFT_PAREN;
 	case RIGHT_PAREN;
-	case COMMA;
+	case LEFT_BRACE;
+	case RIGHT_BRACE;
 
 	case PLUS;
 	case MINUS;
@@ -24,6 +26,8 @@ enum TokenType
 
 	case SIA;
 	case COST;
+	case SE;
+	case SENON;
 
 	case EOF;
 }

@@ -4,6 +4,7 @@ namespace App\Parser;
 
 use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
+use App\Ast\Block;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
 use App\Ast\ConstDeclExpr;
@@ -16,11 +17,13 @@ use App\Lexer\Token;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\Identifier;
+use App\Ast\IfStatement;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
 use App\Ast\UnaryExpr;
 use App\Ast\VarDeclExpr;
 use App\Exceptions\ParseError;
+use Exception;
 
 class Parser
 {
@@ -89,7 +92,56 @@ class Parser
 
     private function parseStatement(): Stmt
     {
+        if ($this->check(TokenType::SE)) {
+            return $this->parseIfStatement();
+        }
+
+        if ($this->check(TokenType::SENON)) {
+            throw new ParseError(
+                "'senon' senza un 'se' corrispondente.",
+                $this->peek()->loc
+            );
+        }
+
+        if ($this->check(TokenType::LEFT_BRACE)) {
+            return $this->parseBlock();
+        }
+
         return $this->parseExprStatement();
+    }
+
+    private function parseIfStatement(): Stmt
+    {
+        $this->expect(TokenType::SE);
+
+        $this->expect(TokenType::LEFT_PAREN);
+        $expr = $this->parseExpression();
+        $this->expect(TokenType::RIGHT_PAREN);
+
+        $then = $this->parseBlock();
+
+        $else = null;
+        if ($this->check(TokenType::SENON)) {
+            $this->consume();
+
+            $else = $this->check(TokenType::SE)
+                ? $this->parseIfStatement()
+                : $this->parseBlock();
+        }
+
+        return new IfStatement($expr, $then, $else);
+    }
+
+    private function parseBlock(): Stmt
+    {
+        $statements = [];
+        $this->expect(TokenType::LEFT_BRACE);
+        while (!$this->check(TokenType::RIGHT_BRACE) && !$this->isAtEnd()) {
+            $statements[] = $this->parseStatement();
+        }
+        $this->expect(TokenType::RIGHT_BRACE);
+
+        return new Block($statements);
     }
 
     private function parseExprStatement(): Stmt
