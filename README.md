@@ -1,8 +1,14 @@
 # Codice
 
+[![Tests](https://github.com/AdaiasMagdiel/codice/actions/workflows/tests.yml/badge.svg)](https://github.com/AdaiasMagdiel/codice/actions/workflows/tests.yml)
+[![Docs](https://github.com/AdaiasMagdiel/codice/actions/workflows/docs.yml/badge.svg)](https://github.com/AdaiasMagdiel/codice/actions/workflows/docs.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 Codice is a small programming language with keywords in Italian. It has no real-world ambition — it exists purely as a study project, a way to learn how programming languages are built (lexer, parser, interpreter) while also practicing Italian vocabulary along the way.
 
 Written in PHP, it is deliberately simple and unfinished in places. Expect rough edges.
+
+📖 **[Read the full documentation](https://adaiasmagdiel.github.io/codice/)** for a guided tour of the language — types, variables, conditionals, operations, strings, comments and built-ins.
 
 ## Example
 
@@ -34,6 +40,27 @@ Parentesi: 20
 Meno unario: 7
 Concatenazione: ciao mondo
 Ripetizione: ababab
+```
+
+Conditionals are supported too — `se`/`senon` (if/else), chainable with
+`senon se` (else if), each branch a `{ }` block with its own scope. Every
+value has a truthiness rule, not just `booleano`. See
+[examples/condizionali.cod](examples/condizionali.cod):
+
+```sh
+$ php codice.php examples/condizionali.cod
+Questo blocco viene sempre eseguito.
+La condizione era falsa, quindi eseguo questo blocco.
+0 è falso: entro nel ramo senon.
+1 è vero: qualsiasi intero diverso da zero lo è.
+0.0 è falso, come 0.
+Una stringa vuota è falsa.
+Una stringa non vuota è vera.
+nullo è sempre falso.
+Entra in questo ramo, tramite 'senon se'.
+Fuori.
+Dentro.
+Dentro il blocco: solo qui dentro
 ```
 
 ## Usage
@@ -92,7 +119,9 @@ AST directly. Values are represented by a small runtime type system
 declares a variable, `cost` declares a constant (always requires an initial
 value, and can never be reassigned), and an already-declared variable can be
 reassigned with `=`. Functions are values like any other, so they can be
-assigned to a variable and called through it. See
+assigned to a variable and called through it. Control flow is available
+through `se`/`senon`/`senon se` (if/else/else-if), and any `{ }` block —
+attached to an `se` or standalone — introduces its own lexical scope. See
 [examples/assegnamenti.cod](examples/assegnamenti.cod):
 
 ```sh
@@ -109,13 +138,32 @@ Fantastico!
 PI vale: 3.1415926535898
 ```
 
-There is still no control flow and no user-defined functions yet.
+There are still no loops and no user-defined functions yet.
+
+## Documentation
+
+The [full guide](https://adaiasmagdiel.github.io/codice/) covers every part
+of the language in more depth than this README:
+
+- [What is Codice?](https://adaiasmagdiel.github.io/codice/guide/introduction)
+- [Installation](https://adaiasmagdiel.github.io/codice/guide/installation)
+- [The REPL](https://adaiasmagdiel.github.io/codice/guide/repl)
+- [Primitive types](https://adaiasmagdiel.github.io/codice/guide/types)
+- [Variables](https://adaiasmagdiel.github.io/codice/guide/variables)
+- [Conditionals](https://adaiasmagdiel.github.io/codice/guide/conditionals)
+- [Math operations](https://adaiasmagdiel.github.io/codice/guide/operations)
+- [Strings](https://adaiasmagdiel.github.io/codice/guide/strings)
+- [Comments](https://adaiasmagdiel.github.io/codice/guide/comments)
+- [Built-in functions](https://adaiasmagdiel.github.io/codice/guide/builtin)
 
 ## Tests
 
+The test suite is written with [Pest](https://pestphp.com) and runs on every
+push and pull request via [GitHub Actions](.github/workflows/tests.yml).
+
 ```sh
 composer test            # Run the test suite (Pest)
-composer test:coverage   # Run with coverage report (requires Xdebug)
+composer test:coverage   # Run with coverage report (requires Xdebug, enforces a 90% minimum)
 ```
 
 ## License
