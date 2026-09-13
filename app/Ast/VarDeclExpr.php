@@ -2,13 +2,4 @@
 
 namespace App\Ast;
 
-use App\Interfaces\Expr;
-use App\Lexer\Token;
-
-class VarDeclExpr implements Expr
-{
-    public function __construct(
-        public Token $identifier,
-        public Expr $value
-    ) {}
-}
+class VarDeclExpr extends DeclExpr {}
