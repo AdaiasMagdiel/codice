@@ -3,6 +3,7 @@
 use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\CallExpr;
+use App\Ast\ConstDeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
@@ -272,6 +273,56 @@ it('reports a parse error when a variable declaration uses a reserved word as it
 it('reports a parse error when a variable declaration has no identifier at all', function () {
     parseParserSource('sia;');
 })->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'SEMICOLON'.");
+
+it('parses a constant declaration', function () {
+    $program = parseParserSource('cost PI = 3.14;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(ConstDeclExpr::class)
+        ->and($expr->identifier->lexeme)->toBe('PI')
+        ->and($expr->value)->toBeInstanceOf(FloatLiteral::class);
+});
+
+it('parses a constant declaration nested as another declaration\'s value', function () {
+    $program = parseParserSource('cost x = cost y = 5;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(ConstDeclExpr::class)
+        ->and($expr->identifier->lexeme)->toBe('x')
+        ->and($expr->value)->toBeInstanceOf(ConstDeclExpr::class)
+        ->and($expr->value->identifier->lexeme)->toBe('y');
+});
+
+it('parses a constant declaration used as a call argument', function () {
+    $program = parseParserSource('stampa(cost x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(CallExpr::class)
+        ->and($expr->args[0])->toBeInstanceOf(ConstDeclExpr::class);
+});
+
+it('parses a constant declaration inside parentheses', function () {
+    $program = parseParserSource('(cost x = 5);');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(ConstDeclExpr::class);
+});
+
+it('reports a parse error when a constant declaration is missing the identifier', function () {
+    parseParserSource('cost = 5;');
+})->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'ASSIGN'.");
+
+it('reports a parse error when a constant declaration has no identifier at all', function () {
+    parseParserSource('cost;');
+})->throws(ParseError::class, "Atteso 'IDENTIFIER', ma è stato trovato 'SEMICOLON'.");
+
+it('reports a parse error when a constant declaration is missing its initial value', function () {
+    parseParserSource('cost x;');
+})->throws(ParseError::class, "Atteso 'ASSIGN', ma è stato trovato 'SEMICOLON'.");
+
+it('reports a parse error when a constant declaration is missing its value after "="', function () {
+    parseParserSource('cost x = ;');
+})->throws(ParseError::class, 'Atteso un valore.');
 
 it('parses an assignment expression', function () {
     $program = parseParserSource('x = 5;');

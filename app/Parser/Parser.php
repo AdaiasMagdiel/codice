@@ -6,6 +6,7 @@ use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
+use App\Ast\ConstDeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
 use App\Enums\TokenType;
@@ -105,6 +106,10 @@ class Parser
             return $this->parseVarDeclExpr();
         }
 
+        if ($this->check(TokenType::COST)) {
+            return $this->parseConstDeclExpr();
+        }
+
         if (
             $this->check(TokenType::IDENTIFIER) &&
             $this->check(TokenType::ASSIGN, 1)
@@ -128,6 +133,17 @@ class Parser
         }
 
         return new VarDeclExpr($identifier, $value);
+    }
+
+    private function parseConstDeclExpr(): Expr
+    {
+        $this->expect(TokenType::COST);
+
+        $identifier = $this->expect(TokenType::IDENTIFIER);
+        $this->expect(TokenType::ASSIGN);
+        $value = $this->parseExpression();
+
+        return new ConstDeclExpr($identifier, $value);
     }
 
     private function parseAssignExpr(): Expr

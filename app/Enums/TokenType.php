@@ -23,6 +23,7 @@ enum TokenType
 	case ASSIGN;
 
 	case SIA;
+	case COST;
 
 	case EOF;
 }

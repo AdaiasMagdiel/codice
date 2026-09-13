@@ -10,7 +10,8 @@ class Keyword
 		"nullo" => TokenType::NULL,
 		"vero"  => TokenType::BOOL,
 		"falso" => TokenType::BOOL,
-		"sia"	=> TokenType::SIA
+		"sia"	=> TokenType::SIA,
+		"cost"	=> TokenType::COST
 	];
 
 	public static function from(string $value): ?TokenType

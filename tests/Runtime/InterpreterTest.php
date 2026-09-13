@@ -234,6 +234,42 @@ it('propagates an error raised while evaluating a variable declaration\'s initia
     runInterpreterSource('sia x = 1 / 0;');
 })->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
 
+it('declares a constant with its initial value', function () {
+    expect(runInterpreterSource('cost PI = 3.14; stampa(PI);'))->toBe("3.14" . PHP_EOL);
+});
+
+it('evaluates a constant declaration to the assigned value', function () {
+    expect(runInterpreterSource('stampa(cost x = 5);'))->toBe("5" . PHP_EOL);
+});
+
+it('throws when declaring a constant that is already declared', function () {
+    runInterpreterSource('cost x = 1; cost x = 2;');
+})->throws(RuntimeError::class, "L'identificatore 'x' è già stato dichiarato.");
+
+it('throws when a constant declaration reuses the name of an already declared variable', function () {
+    runInterpreterSource('sia x = 1; cost x = 2;');
+})->throws(RuntimeError::class, "L'identificatore 'x' è già stato dichiarato.");
+
+it('throws when a variable declaration reuses the name of an already declared constant', function () {
+    runInterpreterSource('cost x = 1; sia x = 2;');
+})->throws(RuntimeError::class, "L'identificatore 'x' è già stato dichiarato.");
+
+it('throws when a constant declaration reuses the name of a builtin function', function () {
+    runInterpreterSource('cost stampa = 5;');
+})->throws(RuntimeError::class, "L'identificatore 'stampa' è già stato dichiarato.");
+
+it('propagates an error raised while evaluating a constant declaration\'s initializer', function () {
+    runInterpreterSource('cost x = 1 / 0;');
+})->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
+
+it('throws when reassigning a declared constant', function () {
+    runInterpreterSource('cost x = 1; x = 2;');
+})->throws(RuntimeError::class, "Impossibile riassegnare la costante 'x'.");
+
+it('throws when reassigning a constant inside a chained assignment', function () {
+    runInterpreterSource('sia y = 0; cost x = 1; y = x = 2;');
+})->throws(RuntimeError::class, "Impossibile riassegnare la costante 'x'.");
+
 it('reassigns a previously declared variable', function () {
     expect(runInterpreterSource('sia x = 1; x = 2; stampa(x);'))->toBe("2" . PHP_EOL);
 });

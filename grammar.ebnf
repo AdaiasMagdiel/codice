@@ -4,8 +4,9 @@ Statement       ::= ExprStatement ;
 
 ExprStatement   ::= Expression , ";" ;
 
-Expression      ::= VarDeclExpr | AssignExpr | AdditiveExpr ;
+Expression      ::= VarDeclExpr | ConstDeclExpr | AssignExpr | AdditiveExpr ;
 
+ConstDeclExpr   ::= "cost" , Identifier , "=" , Expression ;
 VarDeclExpr     ::= "sia" , Identifier , [ "=" , Expression ] ;
 AssignExpr      ::= Identifier , "=" , Expression ;
 

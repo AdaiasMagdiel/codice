@@ -6,6 +6,7 @@ use App\Ast\AssignExpr;
 use App\Ast\BinaryExpr;
 use App\Ast\BoolLiteral;
 use App\Ast\CallExpr;
+use App\Ast\ConstDeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
 use App\Ast\Identifier;
@@ -110,6 +111,14 @@ class Interpreter
         else if ($expr instanceof VarDeclExpr) {
             $value = $this->runExpression($expr->value);
             $this->environment->define($expr->identifier, $value);
+
+            return $value;
+        }
+
+        // constant declaration
+        else if ($expr instanceof ConstDeclExpr) {
+            $value = $this->runExpression($expr->value);
+            $this->environment->defineConst($expr->identifier, $value);
 
             return $value;
         }

@@ -10,6 +10,7 @@ use App\Lexer\Token;
 class Environment
 {
     public array $globals = [];
+    private array $constants = [];
 
     public function __construct()
     {
@@ -20,45 +21,57 @@ class Environment
         ];
     }
 
+    public function has(Token $identifier): bool
+    {
+        return array_key_exists($identifier->lexeme, $this->globals);
+    }
+
     public function get(Token $identifier)
     {
-        $key = $identifier->lexeme;
-
-        if (!array_key_exists($key, $this->globals)) {
+        if (!$this->has($identifier)) {
             throw new RuntimeError(
-                "Identificatore '{$key}' non definito.",
+                "Identificatore '{$identifier->lexeme}' non definito.",
                 $identifier->loc
             );
         }
 
-        return $this->globals[$key];
+        return $this->globals[$identifier->lexeme];
     }
 
     public function define(Token $identifier, mixed $value)
     {
-        $key = $identifier->lexeme;
-
-        if (array_key_exists($key, $this->globals)) {
+        if ($this->has($identifier)) {
             throw new RuntimeError(
-                "L'identificatore '{$key}' è già stato dichiarato.",
+                "L'identificatore '{$identifier->lexeme}' è già stato dichiarato.",
                 $identifier->loc
             );
         }
 
-        $this->globals[$key] = $value;
+        $this->globals[$identifier->lexeme] = $value;
+    }
+
+    public function defineConst(Token $identifier, mixed $value)
+    {
+        $this->define($identifier, $value);
+        $this->constants[$identifier->lexeme] = true;
     }
 
     public function assign(Token $identifier, mixed $value)
     {
-        $key = $identifier->lexeme;
-
-        if (!array_key_exists($key, $this->globals)) {
+        if (!$this->has($identifier)) {
             throw new RuntimeError(
-                "Identificatore '{$key}' non definito.",
+                "Identificatore '{$identifier->lexeme}' non definito.",
                 $identifier->loc
             );
         }
 
-        $this->globals[$key] = $value;
+        if (isset($this->constants[$identifier->lexeme])) {
+            throw new RuntimeError(
+                "Impossibile riassegnare la costante '{$identifier->lexeme}'.",
+                $identifier->loc
+            );
+        }
+
+        $this->globals[$identifier->lexeme] = $value;
     }
 }
