@@ -75,7 +75,7 @@ export default defineConfig({
         aliases: ['cod'],
         scopeName: 'source.cod',
         patterns: [
-          { match: '\\b(sia|cost|stampa|vero|falso|nullo|esci|se|senon)\\b', name: 'keyword.control.cod' },
+          { match: '\\b(sia|cost|stampa|vero|falso|nullo|esci|se|altrimenti)\\b', name: 'keyword.control.cod' },
           { match: '\\b(stringa|intero|decimale|booleano)\\b', name: 'storage.type.cod' },
           { match: '"[^"]*"', name: 'string.quoted.double.cod' },
           { match: '\\b\\d+(\\.\\d+)?\\b', name: 'constant.numeric.cod' },

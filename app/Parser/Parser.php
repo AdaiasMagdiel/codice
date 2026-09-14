@@ -96,9 +96,9 @@ class Parser
             return $this->parseIfStatement();
         }
 
-        if ($this->check(TokenType::SENON)) {
+        if ($this->check(TokenType::ALTRIMENTI)) {
             throw new ParseError(
-                "'senon' senza un 'se' corrispondente.",
+                "'altrimenti' senza un 'se' corrispondente.",
                 $this->peek()->loc
             );
         }
@@ -121,7 +121,7 @@ class Parser
         $then = $this->parseBlock();
 
         $else = null;
-        if ($this->check(TokenType::SENON)) {
+        if ($this->check(TokenType::ALTRIMENTI)) {
             $this->consume();
 
             $else = $this->check(TokenType::SE)

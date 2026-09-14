@@ -3,10 +3,10 @@ se (vero) {
 	stampa("Questo blocco viene sempre eseguito.");
 }
 
-// "senon" esegue il proprio blocco quando la condizione è falsa.
+// "altrimenti" esegue il proprio blocco quando la condizione è falsa.
 se (falso) {
 	stampa("Non vedrai mai questo messaggio.");
-} senon {
+} altrimenti {
 	stampa("La condizione era falsa, quindi eseguo questo blocco.");
 }
 
@@ -19,8 +19,8 @@ se (falso) {
 
 se (0) {
 	stampa("Non stampato: 0 è falso.");
-} senon {
-	stampa("0 è falso: entro nel ramo senon.");
+} altrimenti {
+	stampa("0 è falso: entro nel ramo altrimenti.");
 }
 
 se (1) {
@@ -29,13 +29,13 @@ se (1) {
 
 se (0.0) {
 	stampa("Non stampato: 0.0 è falso.");
-} senon {
+} altrimenti {
 	stampa("0.0 è falso, come 0.");
 }
 
 se ("") {
 	stampa("Non stampato: la stringa vuota è falsa.");
-} senon {
+} altrimenti {
 	stampa("Una stringa vuota è falsa.");
 }
 
@@ -45,19 +45,19 @@ se ("ciao") {
 
 se (nullo) {
 	stampa("Non stampato: nullo è sempre falso.");
-} senon {
+} altrimenti {
 	stampa("nullo è sempre falso.");
 }
 
-// Si possono incatenare più condizioni con "senon se", proprio come un
+// Si possono incatenare più condizioni con "altrimenti se", proprio come un
 // if/else-if/else in altri linguaggi.
 se (falso) {
 	stampa("Non entra qui.");
-} senon se (falso) {
+} altrimenti se (falso) {
 	stampa("Nemmeno qui.");
-} senon se (vero) {
-	stampa("Entra in questo ramo, tramite 'senon se'.");
-} senon {
+} altrimenti se (vero) {
+	stampa("Entra in questo ramo, tramite 'altrimenti se'.");
+} altrimenti {
 	stampa("Non arriva mai qui: uno dei rami sopra era vero.");
 }
 

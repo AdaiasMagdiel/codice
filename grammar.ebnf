@@ -3,7 +3,7 @@ Program         ::= { Statement } ;
 Statement       ::= IfStatement | Block | ExprStatement ;
 
 ExprStatement   ::= Expression , ";" ;
-IfStatement     ::= "se" , "(" , Expression , ")" , Block , [ "senon" , ( IfStatement | Block) ] ;
+IfStatement     ::= "se" , "(" , Expression , ")" , Block , [ "altrimenti" , ( IfStatement | Block) ] ;
 
 Block           ::= "{" , { Statement } , "}" ;
 

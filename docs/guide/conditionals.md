@@ -1,8 +1,8 @@
 # Conditionals
 
-Codice branches with `se` ("if") and, optionally, `senon` ("else").
+Codice branches with `se` ("if") and, optionally, `altrimenti` ("else").
 
-## se / senon
+## se / altrimenti
 
 ```cod
 se (vero) {
@@ -11,28 +11,28 @@ se (vero) {
 
 se (falso) {
 	stampa("Non vedrai mai questo messaggio.");
-} senon {
+} altrimenti {
 	stampa("La condizione era falsa.");  // → La condizione era falsa.
 }
 ```
 
-The condition must be parenthesized, and both `se` and `senon` require a `{ }` block — there's no single-statement form without braces.
+The condition must be parenthesized, and both `se` and `altrimenti` require a `{ }` block — there's no single-statement form without braces.
 
 ## Else-if chains
 
-`senon` followed directly by another `se` chains conditions, just like `else if` elsewhere:
+`altrimenti` followed directly by another `se` chains conditions, just like `else if` elsewhere:
 
 ```cod
 se (falso) {
 	stampa("Non entra qui.");
-} senon se (vero) {
+} altrimenti se (vero) {
 	stampa("Entra in questo ramo.");  // → Entra in questo ramo.
-} senon {
+} altrimenti {
 	stampa("Non arriva mai qui.");
 }
 ```
 
-Each `senon se` is itself an `IfStatement` nested inside the previous one's `senon` branch, so the chain can be as long as needed, and the final `senon` (if present) still only runs when every condition above it was false.
+Each `altrimenti se` is itself an `IfStatement` nested inside the previous one's `altrimenti` branch, so the chain can be as long as needed, and the final `altrimenti` (if present) still only runs when every condition above it was false.
 
 ## Truthiness
 
@@ -47,11 +47,11 @@ Any value can be used as a condition, not just `booleano`. Each type has its own
 | `nullo` | always | never |
 
 ```cod
-se (0) { stampa("sim"); } senon { stampa("nao"); }       // → nao
+se (0) { stampa("sim"); } altrimenti { stampa("nao"); }       // → nao
 se (1) { stampa("sim"); }                                 // → sim
-se ("") { stampa("sim"); } senon { stampa("nao"); }      // → nao
+se ("") { stampa("sim"); } altrimenti { stampa("nao"); }      // → nao
 se ("ciao") { stampa("sim"); }                            // → sim
-se (nullo) { stampa("sim"); } senon { stampa("nao"); }   // → nao
+se (nullo) { stampa("sim"); } altrimenti { stampa("nao"); }   // → nao
 ```
 
 ::: warning Functions have no truthiness — on purpose
@@ -69,7 +69,7 @@ Codice raises a `TypeError` instead, pointing at the exact identifier and asking
 
 ## Blocks and scope
 
-Every `{ }` — whether it's the body of a `se`, a `senon`, or just a bare block — introduces its own scope. A variable declared with `sia` inside a block does not exist outside of it:
+Every `{ }` — whether it's the body of a `se`, a `altrimenti`, or just a bare block — introduces its own scope. A variable declared with `sia` inside a block does not exist outside of it:
 
 ```cod
 se (vero) {

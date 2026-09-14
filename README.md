@@ -44,8 +44,8 @@ Concatenazione: ciao mondo
 Ripetizione: ababab
 ```
 
-Conditionals are supported too — `se`/`senon` (if/else), chainable with
-`senon se` (else if), each branch a `{ }` block with its own scope. Every
+Conditionals are supported too — `se`/`altrimenti` (if/else), chainable with
+`altrimenti se` (else if), each branch a `{ }` block with its own scope. Every
 value has a truthiness rule, not just `booleano`. See
 [examples/condizionali.cod](examples/condizionali.cod):
 
@@ -53,13 +53,13 @@ value has a truthiness rule, not just `booleano`. See
 $ php codice.php examples/condizionali.cod
 Questo blocco viene sempre eseguito.
 La condizione era falsa, quindi eseguo questo blocco.
-0 è falso: entro nel ramo senon.
+0 è falso: entro nel ramo altrimenti.
 1 è vero: qualsiasi intero diverso da zero lo è.
 0.0 è falso, come 0.
 Una stringa vuota è falsa.
 Una stringa non vuota è vera.
 nullo è sempre falso.
-Entra in questo ramo, tramite 'senon se'.
+Entra in questo ramo, tramite 'altrimenti se'.
 Fuori.
 Dentro.
 Dentro il blocco: solo qui dentro
@@ -122,7 +122,7 @@ declares a variable, `cost` declares a constant (always requires an initial
 value, and can never be reassigned), and an already-declared variable can be
 reassigned with `=`. Functions are values like any other, so they can be
 assigned to a variable and called through it. Control flow is available
-through `se`/`senon`/`senon se` (if/else/else-if), and any `{ }` block —
+through `se`/`altrimenti`/`altrimenti se` (if/else/else-if), and any `{ }` block —
 attached to an `se` or standalone — introduces its own lexical scope. See
 [examples/assegnamenti.cod](examples/assegnamenti.cod):
 

@@ -27,7 +27,7 @@ enum TokenType
 	case SIA;
 	case COST;
 	case SE;
-	case SENON;
+	case ALTRIMENTI;
 
 	case EOF;
 }

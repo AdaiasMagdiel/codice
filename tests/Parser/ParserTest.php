@@ -431,7 +431,7 @@ it('parses an if statement without an else branch', function () {
 });
 
 it('parses an if/else statement', function () {
-    $program = parseParserSource('se (vero) { 1; } senon { 2; }');
+    $program = parseParserSource('se (vero) { 1; } altrimenti { 2; }');
     $stmt = $program->statements[0];
 
     expect($stmt)->toBeInstanceOf(IfStatement::class)
@@ -439,7 +439,7 @@ it('parses an if/else statement', function () {
 });
 
 it('parses an if/else-if/else chain', function () {
-    $program = parseParserSource('se (vero) { 1; } senon se (falso) { 2; } senon { 3; }');
+    $program = parseParserSource('se (vero) { 1; } altrimenti se (falso) { 2; } altrimenti { 3; }');
     $stmt = $program->statements[0];
 
     expect($stmt->else)->toBeInstanceOf(IfStatement::class)
@@ -452,9 +452,9 @@ it('reports a parse error when an if condition is missing its parentheses', func
 })->throws(ParseError::class, "Atteso 'LEFT_PAREN', ma è stato trovato 'BOOL'.");
 
 it('reports a parse error for a dangling else with no matching if', function () {
-    parseParserSource('senon { 1; }');
-})->throws(ParseError::class, "'senon' senza un 'se' corrispondente.");
+    parseParserSource('altrimenti { 1; }');
+})->throws(ParseError::class, "'altrimenti' senza un 'se' corrispondente.");
 
 it('reports a parse error for a dangling else inside a block', function () {
-    parseParserSource('{ senon { 1; } }');
-})->throws(ParseError::class, "'senon' senza un 'se' corrispondente.");
+    parseParserSource('{ altrimenti { 1; } }');
+})->throws(ParseError::class, "'altrimenti' senza un 'se' corrispondente.");

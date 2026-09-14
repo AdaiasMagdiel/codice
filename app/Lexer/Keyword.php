@@ -13,7 +13,7 @@ class Keyword
 		"sia"	=> TokenType::SIA,
 		"cost"	=> TokenType::COST,
 		"se"	=> TokenType::SE,
-		"senon" => TokenType::SENON
+		"altrimenti" => TokenType::ALTRIMENTI
 	];
 
 	public static function from(string $value): ?TokenType

@@ -336,12 +336,12 @@ it('throws when calling something that is not a function', function () {
 });
 
 it('runs the then branch when the condition is true', function () {
-    expect(runInterpreterSource('se (vero) { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se (vero) { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("sim" . PHP_EOL);
 });
 
 it('runs the else branch when the condition is false', function () {
-    expect(runInterpreterSource('se (falso) { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se (falso) { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("nao" . PHP_EOL);
 });
 
@@ -350,13 +350,13 @@ it('runs nothing when the condition is false and there is no else branch', funct
 });
 
 it('chains an else-if to pick the first matching branch', function () {
-    $source = 'se (falso) { stampa("um"); } senon se (vero) { stampa("dois"); } senon { stampa("tres"); }';
+    $source = 'se (falso) { stampa("um"); } altrimenti se (vero) { stampa("dois"); } altrimenti { stampa("tres"); }';
 
     expect(runInterpreterSource($source))->toBe("dois" . PHP_EOL);
 });
 
 it('falls through an else-if chain to the final else', function () {
-    $source = 'se (falso) { stampa("um"); } senon se (falso) { stampa("dois"); } senon { stampa("tres"); }';
+    $source = 'se (falso) { stampa("um"); } altrimenti se (falso) { stampa("dois"); } altrimenti { stampa("tres"); }';
 
     expect(runInterpreterSource($source))->toBe("tres" . PHP_EOL);
 });
@@ -375,7 +375,7 @@ it('treats a non-zero integer as true', function () {
 });
 
 it('treats zero as false', function () {
-    expect(runInterpreterSource('se (0) { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se (0) { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("nao" . PHP_EOL);
 });
 
@@ -384,7 +384,7 @@ it('treats a non-zero decimal as true', function () {
 });
 
 it('treats 0.0 as false', function () {
-    expect(runInterpreterSource('se (0.0) { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se (0.0) { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("nao" . PHP_EOL);
 });
 
@@ -393,12 +393,12 @@ it('treats a non-empty string as true', function () {
 });
 
 it('treats an empty string as false', function () {
-    expect(runInterpreterSource('se ("") { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se ("") { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("nao" . PHP_EOL);
 });
 
 it('treats nullo as false', function () {
-    expect(runInterpreterSource('se (nullo) { stampa("sim"); } senon { stampa("nao"); }'))
+    expect(runInterpreterSource('se (nullo) { stampa("sim"); } altrimenti { stampa("nao"); }'))
         ->toBe("nao" . PHP_EOL);
 });
 
