@@ -8,7 +8,7 @@ use App\Lexer\Token;
 class PostfixExpr implements Expr
 {
     public function __construct(
-        public Expr $expr,
+        public Expr $lvalue,
         public Token $operator
     ) {}
 }

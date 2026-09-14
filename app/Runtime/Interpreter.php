@@ -15,6 +15,7 @@ use App\Ast\Identifier;
 use App\Ast\IfStatement;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
+use App\Ast\PostfixExpr;
 use App\Ast\Program;
 use App\Ast\StringLiteral;
 use App\Ast\UnaryExpr;
@@ -251,6 +252,29 @@ class Interpreter
         // floats
         else if ($expr instanceof FloatLiteral) {
             return new Decimale($expr->token->lexeme);
+        }
+
+        // postfixes
+        else if ($expr instanceof PostfixExpr) {
+            $op = $expr->operator;
+            $currentValue = $this->runExpression($expr->lvalue);
+
+            if (!$expr->lvalue instanceof Identifier) {
+                $operation = $op->type === TokenType::INCREMENT
+                    ? 'incremento'
+                    : 'decremento';
+                throw new RuntimeError("Richiesto un lvalue come operando di {$operation}.", $expr->lvalue->token->loc);
+            }
+
+            $this->expectType($op, $currentValue, [Intero::class, Decimale::class]);
+            $newValue = $this->toCodiceType(
+                $op->type === TokenType::INCREMENT
+                    ? $currentValue->value + 1
+                    : $currentValue->value - 1
+            );
+            $this->environment->assign($expr->lvalue->token, $newValue);
+
+            return $currentValue;
         }
 
         // unary
