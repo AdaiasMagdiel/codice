@@ -1,49 +1,50 @@
-Program         ::= { Statement } ;
+Program         = { Statement } ;
 
-Statement       ::= IfStatement | Block | ExprStatement ;
+Statement       = IfStatement | ForStatement | Block | ExprStatement ;
 
-ExprStatement   ::= Expression , ";" ;
-IfStatement     ::= "se" , "(" , Expression , ")" , Block , [ "altrimenti" , ( IfStatement | Block) ] ;
+ExprStatement   = Expression , ";" ;
+IfStatement     = "se" , "(" , Expression , ")" , Block , [ "altrimenti" , ( IfStatement | Block) ] ;
+ForStatement    = "per" , "(" , [ VarDeclExpr | Expression ] , ";" , [ Expression ] , ";" , [ Expression ] , ")" , Block ;
 
-Block           ::= "{" , { Statement } , "}" ;
+Block           = "{" , { Statement } , "}" ;
 
-Expression      ::= VarDeclExpr | ConstDeclExpr | AssignExpr | AdditiveExpr ;
+Expression      = VarDeclExpr | ConstDeclExpr | AssignExpr | AdditiveExpr ;
 
-ConstDeclExpr   ::= "cost" , Identifier , "=" , Expression ;
-VarDeclExpr     ::= "sia" , Identifier , [ "=" , Expression ] ;
-AssignExpr      ::= Identifier , "=" , Expression ;
+ConstDeclExpr   = "cost" , Identifier , "=" , Expression ;
+VarDeclExpr     = "sia" , Identifier , [ "=" , Expression ] ;
+AssignExpr      = Identifier , "=" , Expression ;
 
-AdditiveExpr    ::= MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
-MultiplicativeExpr ::= UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
-UnaryExpr       ::= [ UnaryOperator ] , PrimaryExpr ;
-UnaryOperator   ::= "-" | "+" ;
+AdditiveExpr    = MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
+MultiplicativeExpr = UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
+UnaryExpr       = [ UnaryOperator ] , PrimaryExpr ;
+UnaryOperator   = "-" | "+" ;
 
-PrimaryExpr     ::= CallExpr
+PrimaryExpr     = CallExpr
                   | Identifier
                   | Literal
                   | "(" , Expression , ")" ;
 
-Literal         ::= StringLiteral
+Literal         = StringLiteral
                   | NullLiteral 
                   | BoolLiteral 
                   | FloatLiteral 
                   | IntLiteral ;
 
-CallExpr        ::= Identifier , "(" , [ ArgumentList ] , ")" ;
-ArgumentList    ::= Expression , { "," , Expression } ;
+CallExpr        = Identifier , "(" , [ ArgumentList ] , ")" ;
+ArgumentList    = Expression , { "," , Expression } ;
 
-Identifier      ::= ( Letter | "_" ) , { Letter | Digit | "_" } ;
-StringLiteral   ::= '"' , { StringCharacter } , '"' ;
-NullLiteral     ::= "nullo" ;
-BoolLiteral     ::= "vero" | "falso" ;
-IntLiteral      ::= "0" | ( NonZeroDigit , DigitGroup ) ;
-FloatLiteral    ::= ( IntLiteral , "." , [ Digit , DigitGroup ] )
+Identifier      = ( Letter | "_" ) , { Letter | Digit | "_" } ;
+StringLiteral   = '"' , { StringCharacter } , '"' ;
+NullLiteral     = "nullo" ;
+BoolLiteral     = "vero" | "falso" ;
+IntLiteral      = "0" | ( NonZeroDigit , DigitGroup ) ;
+FloatLiteral    = ( IntLiteral , "." , [ Digit , DigitGroup ] )
                   | ( "." , Digit , DigitGroup ) ;
 
-Letter          ::= "a".."z" | "A".."Z" ;
-NonZeroDigit    ::= "1".."9" ;
-Digit           ::= "0" | NonZeroDigit ;
-DigitGroup      ::= { [ "_" ] , Digit } ;
+Letter          = "a".."z" | "A".."Z" ;
+NonZeroDigit    = "1".."9" ;
+Digit           = "0" | NonZeroDigit ;
+DigitGroup      = { [ "_" ] , Digit } ;
 
-StringCharacter ::= ? any character except '"' and newline ? | EscapeSequence ;
-EscapeSequence  ::= "\" , ( '"' | "\" | "n" | "t" | "r" ) ;
+StringCharacter = ? any character except '"' and newline ? | EscapeSequence ;
+EscapeSequence  = "\" , ( '"' | "\" | "n" | "t" | "r" ) ;
