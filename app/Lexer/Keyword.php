@@ -7,13 +7,14 @@ use App\Enums\TokenType;
 class Keyword
 {
 	private static array $keywords = [
-		"nullo" => TokenType::NULL,
-		"vero"  => TokenType::BOOL,
-		"falso" => TokenType::BOOL,
-		"sia"	=> TokenType::SIA,
-		"cost"	=> TokenType::COST,
-		"se"	=> TokenType::SE,
-		"altrimenti" => TokenType::ALTRIMENTI
+		"nullo" 	 => TokenType::NULL,
+		"vero"  	 => TokenType::BOOL,
+		"falso" 	 => TokenType::BOOL,
+		"sia"		 => TokenType::SIA,
+		"cost"		 => TokenType::COST,
+		"se"		 => TokenType::SE,
+		"altrimenti" => TokenType::ALTRIMENTI,
+		"per"		 => TokenType::PER
 	];
 
 	public static function from(string $value): ?TokenType

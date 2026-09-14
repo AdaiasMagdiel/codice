@@ -25,11 +25,20 @@ enum TokenType
 	case ASSIGN;
 	case INCREMENT;
 	case DECREMENT;
+	case LESS;
+	case GREATER;
+	case LESS_EQUAL;
+	case GREATER_EQUAL;
+	case EQUAL;
+	case NOT_EQUAL;
+	case AND;
+	case OR;
 
 	case SIA;
 	case COST;
 	case SE;
 	case ALTRIMENTI;
+	case PER;
 
 	case EOF;
 }

@@ -19,7 +19,15 @@ class Symbol
         "/"  => TokenType::SLASH,
         "="  => TokenType::ASSIGN,
         "++" => TokenType::INCREMENT,
-        "--" => TokenType::DECREMENT
+        "--" => TokenType::DECREMENT,
+        ">"  => TokenType::GREATER,
+        "<"  => TokenType::LESS,
+        ">=" => TokenType::GREATER_EQUAL,
+        "<=" => TokenType::LESS_EQUAL,
+        "==" => TokenType::EQUAL,
+        "!=" => TokenType::NOT_EQUAL,
+        "&&" => TokenType::AND,
+        "||" => TokenType::OR
     ];
 
     public static function from(string $value): ?TokenType
