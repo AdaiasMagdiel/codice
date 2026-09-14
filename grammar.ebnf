@@ -8,18 +8,24 @@ ForStatement    = "per" , "(" , [ VarDeclExpr | Expression ] , ";" , [ Expressio
 
 Block           = "{" , { Statement } , "}" ;
 
-Expression      = VarDeclExpr | ConstDeclExpr | AssignExpr | AdditiveExpr ;
+Expression      = VarDeclExpr | ConstDeclExpr | AssignExpr | LogicalOrExpr ;
 
-ConstDeclExpr   = "cost" , Identifier , "=" , Expression ;
 VarDeclExpr     = "sia" , Identifier , [ "=" , Expression ] ;
+ConstDeclExpr   = "cost" , Identifier , "=" , Expression ;
 AssignExpr      = Identifier , "=" , Expression ;
 
+LogicalOrExpr      = LogicalAndExpr , { "||" , LogicalAndExpr } ;
+LogicalAndExpr     = EqualityExpr , { "&&" , EqualityExpr } ;
+EqualityExpr       = RelationalExpr , { ( "==" | "!=" ) , RelationalExpr } ;
+RelationalExpr     = AdditiveExpr , { ( RelationalOperator ) , AdditiveExpr } ;
 AdditiveExpr       = MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
 MultiplicativeExpr = UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
 
 UnaryExpr       = ( "++" | "--" | UnaryOperator ) , UnaryExpr  | PostfixExpr ;
 PostfixExpr     = PrimaryExpr , [ "++" | "--" ] ;
-UnaryOperator   = "-" | "+" ;
+
+RelationalOperator = "<" | ">" | "<=" | ">=" ;
+UnaryOperator      = "-" | "+" ;
 
 PrimaryExpr     = CallExpr
                   | Identifier

@@ -170,7 +170,7 @@ class Parser
             return $this->parseAssignExpr();
         }
 
-        return $this->parseAdditiveExpression();
+        return $this->parseLogicalOrExpr();
     }
 
     private function parseVarDeclExpr(): Expr
@@ -206,6 +206,74 @@ class Parser
         $value = $this->parseExpression();
 
         return new AssignExpr($identifier, $value);
+    }
+
+    private function parseLogicalOrExpr(): Expr
+    {
+        $expr = $this->parseLogicalAndExpr();
+
+        if ($this->check(TokenType::OR)) {
+            $expr = new BinaryExpr(
+                $expr,
+                $this->consume(),
+                $this->parseLogicalAndExpr()
+            );
+        }
+
+        return $expr;
+    }
+
+    private function parseLogicalAndExpr(): Expr
+    {
+        $expr = $this->parseEqualityExpr();
+
+        if ($this->check(TokenType::AND)) {
+            $expr = new BinaryExpr(
+                $expr,
+                $this->consume(),
+                $this->parseEqualityExpr()
+            );
+        }
+
+        return $expr;
+    }
+
+    private function parseEqualityExpr(): Expr
+    {
+        $expr = $this->parseRelationalExpr();
+
+        if (
+            $this->check(TokenType::EQUAL) ||
+            $this->check(TokenType::NOT_EQUAL)
+        ) {
+            $expr = new BinaryExpr(
+                $expr,
+                $this->consume(),
+                $this->parseRelationalExpr()
+            );
+        }
+
+        return $expr;
+    }
+
+    private function parseRelationalExpr(): Expr
+    {
+        $expr = $this->parseAdditiveExpression();
+
+        if (
+            $this->check(TokenType::LESS)       ||
+            $this->check(TokenType::LESS_EQUAL) ||
+            $this->check(TokenType::GREATER)    ||
+            $this->check(TokenType::GREATER_EQUAL)
+        ) {
+            $expr = new BinaryExpr(
+                $expr,
+                $this->consume(),
+                $this->parseAdditiveExpression()
+            );
+        }
+
+        return $expr;
     }
 
     private function parseAdditiveExpression(): Expr
