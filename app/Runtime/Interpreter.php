@@ -72,40 +72,44 @@ class Interpreter
         }
     }
 
-    private function toBool(Expr $expr): Booleano
+    private function toBool(Type $value, callable $token): Booleano
     {
-        $value = $this->runExpression($expr);
+        /** @var Stringa|Intero|Decimale|Chiamabile|Nullo|Booleano $value */
 
-        if ($value instanceof Booleano) {
+        if (Booleano::is($value)) {
             return $value;
         }
-        if ($value instanceof Intero) {
+        if (Intero::is($value)) {
             return new Booleano($value->value !== 0);
         }
-        if ($value instanceof Decimale) {
+        if (Decimale::is($value)) {
             return new Booleano($value->value !== 0.0);
         }
-        if ($value instanceof Stringa) {
+        if (Stringa::is($value)) {
             return new Booleano($value->value !== "");
         }
-        if ($value instanceof Nullo) {
+        if (Nullo::is($value)) {
             return new Booleano(false);
         }
-        if ($value instanceof Chiamabile) {
-            $token = match (true) {
-                $expr instanceof Identifier => $expr->token,
-                $expr instanceof CallExpr => $expr->callee,
-                $expr instanceof AssignExpr, $expr instanceof DeclExpr => $expr->identifier,
-            };
-
+        if (Chiamabile::is($value)) {
             throw new TypeError(
                 "'{$value->name}' è una funzione, non un valore booleano. Hai dimenticato di chiamarla con '()'?",
-                $token->loc
+                $token()->loc
             );
         }
 
         $class = get_class($value);
         throw new Exception("Impossibile convertire '{$class}' in booleano.\n");
+    }
+
+    private function exprToken(Expr $expr): Token
+    {
+        return match (true) {
+            $expr instanceof Identifier => $expr->token,
+            $expr instanceof CallExpr => $expr->callee,
+            $expr instanceof AssignExpr, $expr instanceof DeclExpr => $expr->identifier,
+            default => throw new Exception("Impossibile determinare il token dell'espressione '" . get_class($expr) . "'.\n"),
+        };
     }
 
     private function toCodiceType(mixed $value): Type
@@ -155,7 +159,9 @@ class Interpreter
 
     private function runIfStatement(IfStatement $stmt): Nullo
     {
-        if ($this->toBool($stmt->condition)->value) {
+        $condition = $this->runExpression($stmt->condition);
+
+        if ($this->toBool($condition, fn() => $this->exprToken($stmt->condition))->value) {
             $this->runStatement($stmt->then);
         } else if (!is_null($stmt->else)) {
             $this->runStatement($stmt->else);
@@ -189,7 +195,7 @@ class Interpreter
         if ($expr instanceof CallExpr) {
             $fn = $this->environment->get($expr->callee);
 
-            if (!($fn instanceof Chiamabile)) {
+            if (!Chiamabile::is($fn)) {
                 throw new RuntimeError(
                     "Atteso che '{$expr->callee->lexeme}' fosse una funzione.",
                     $expr->callee->loc
@@ -257,6 +263,7 @@ class Interpreter
         // postfixes
         else if ($expr instanceof PostfixExpr) {
             $op = $expr->operator;
+            /** @var Intero|Decimale $currentValue */
             $currentValue = $this->runExpression($expr->lvalue);
 
             if (!$expr->lvalue instanceof Identifier) {
@@ -280,6 +287,7 @@ class Interpreter
         // unary
         else if ($expr instanceof UnaryExpr) {
             $op = $expr->op;
+            /** @var Intero|Decimale|Stringa $right */
             $right = $this->runExpression($expr->right);
 
             switch ($op->type) {
@@ -317,15 +325,51 @@ class Interpreter
 
         // binary
         else if ($expr instanceof BinaryExpr) {
-            $left = $this->runExpression($expr->left);
             $op = $expr->op;
+
+            if ($op->type === TokenType::AND) {
+                $leftBool = $this->toBool(
+                    $this->runExpression($expr->left),
+                    fn() => $this->exprToken($expr->left)
+                );
+
+                if ($leftBool->value) {
+                    return $this->toBool(
+                        $this->runExpression($expr->right),
+                        fn() => $this->exprToken($expr->right)
+                    );
+                }
+
+                return $leftBool;
+            }
+
+            if ($op->type === TokenType::OR) {
+                $leftBool = $this->toBool(
+                    $this->runExpression($expr->left),
+                    fn() => $this->exprToken($expr->left)
+                );
+
+                if ($leftBool->value) {
+                    return $leftBool;
+                }
+
+                return $this->toBool(
+                    $this->runExpression($expr->right),
+                    fn() => $this->exprToken($expr->right)
+                );
+            }
+
+            $left = $this->runExpression($expr->left);
             $right = $this->runExpression($expr->right);
 
             switch ($op->type) {
                 case TokenType::PLUS:
                     $this->expectType($op, [$left, $right], [Intero::class, Decimale::class, Stringa::class]);
 
-                    if ($left instanceof Stringa || $right instanceof Stringa) {
+                    /** @var Intero|Decimale|Stringa $left */
+                    /** @var Intero|Decimale|Stringa $right */
+
+                    if (Stringa::is($left) || Stringa::is($right)) {
                         return new Stringa((string) $left->value . (string) $right->value);
                     }
 
@@ -333,18 +377,25 @@ class Interpreter
 
                 case TokenType::MINUS:
                     $this->expectType($op, [$left, $right], [Intero::class, Decimale::class]);
+
+                    /** @var Intero|Decimale $left */
+                    /** @var Intero|Decimale $right */
+
                     return $this->toCodiceType($left->value - $right->value);
 
                 case TokenType::STAR:
                     $this->expectType($op, [$left, $right], [Intero::class, Decimale::class, Stringa::class]);
 
+                    /** @var Intero|Decimale|Stringa $left */
+                    /** @var Intero|Decimale|Stringa $right */
+
                     // string x string
-                    if ($left instanceof Stringa && $right instanceof Stringa) {
+                    if (Stringa::is($left) && Stringa::is($right)) {
                         throw new TypeError("Operatore '*' non applicabile a due stringhe.", $op->loc);
                     }
 
                     // string x float | float x string - invalid
-                    if (($left instanceof Stringa && $right instanceof Decimale) || ($left instanceof Decimale && $right instanceof Stringa)) {
+                    if ((Stringa::is($left) && Decimale::is($right)) || (Decimale::is($left) && Stringa::is($right))) {
                         throw new TypeError(
                             "Operatore '*' non applicabile tra {$this->typeName($left)} e {$this->typeName($right)}.",
                             $op->loc
@@ -352,8 +403,8 @@ class Interpreter
                     }
 
                     // string x int | int x string
-                    if ($left instanceof Stringa || $right instanceof Stringa) {
-                        [$str, $times] = $left instanceof Stringa
+                    if (Stringa::is($left) || Stringa::is($right)) {
+                        [$str, $times] = Stringa::is($left)
                             ? [$left->value, $right->value]
                             : [$right->value, $left->value];
 
@@ -369,11 +420,50 @@ class Interpreter
                 case TokenType::SLASH:
                     $this->expectType($op, [$left, $right], [Intero::class, Decimale::class]);
 
+                    /** @var Intero|Decimale $left */
+                    /** @var Intero|Decimale $right */
+
                     if ($right->value == 0) {
                         throw new DivisionByZeroError("Impossibile dividere per zero.", $op->loc);
                     }
 
                     return new Decimale((float) $left->value / (float) $right->value);
+
+                case TokenType::LESS:
+                case TokenType::GREATER:
+                case TokenType::GREATER_EQUAL:
+                case TokenType::LESS_EQUAL:
+                    $this->expectType($op, [$left, $right], [Intero::class, Decimale::class, Stringa::class]);
+
+                    if (Stringa::is($left) xor Stringa::is($right)) {
+                        throw new TypeError(
+                            "Operatore '{$op->lexeme}' non applicabile tra {$this->typeName($left)} e {$this->typeName($right)}.",
+                            $op->loc
+                        );
+                    }
+
+                    /** @var Intero|Decimale|Stringa $left */
+                    /** @var Intero|Decimale|Stringa $right */
+                    return $this->toCodiceType(match ($op->type) {
+                        TokenType::LESS => $left->value < $right->value,
+                        TokenType::GREATER => $left->value > $right->value,
+                        TokenType::LESS_EQUAL => $left->value <= $right->value,
+                        TokenType::GREATER_EQUAL => $left->value >= $right->value,
+                    });
+
+                case TokenType::EQUAL:
+                case TokenType::NOT_EQUAL:
+                    /** @var Intero|Decimale|Stringa|Chiamabile|Nullo|Booleano $left */
+                    /** @var Intero|Decimale|Stringa|Chiamabile|Nullo|Booleano $right */
+
+                    $equal = match (true) {
+                        Nullo::is($left) && Nullo::is($right) => true,
+                        Chiamabile::is($left) || Chiamabile::is($right) => $left === $right,
+                        get_class($left) !== get_class($right) => false,
+                        default => $left->value === $right->value,
+                    };
+
+                    return $this->toCodiceType($op->type === TokenType::EQUAL ? $equal : !$equal);
 
                 default:
                     throw new Exception("Operatore binario '{$op->lexeme}' non implementato.\n");
