@@ -72,6 +72,22 @@ class Scanner
 		return $this->content[$index];
 	}
 
+	private function peekN(int $times = 1): string
+	{
+		$result = "";
+		$pos = $this->pos;
+
+		for ($i = 0; $i < $times; $i++) {
+			if ($pos >= $this->length) break;
+
+			$len = $this->utf8CharLength($this->content[$pos]);
+			$result .= substr($this->content, $pos, $len);
+			$pos += $len;
+		}
+
+		return $result;
+	}
+
 	private function match(string $value): bool
 	{
 		if ($this->pos + strlen($value) > $this->length) {
@@ -278,7 +294,14 @@ class Scanner
 				$this->skipComment();
 			}
 
-			// symbols
+			// symbols - 2 chars
+			else if (($tokenType = Symbol::from($this->peekN(2))) !== null) {
+				$loc = $this->getLoc();
+				$lexeme = $this->consume(2);
+				$tokens[] = new Token($tokenType, $lexeme, $loc);
+			}
+
+			// symbols - 1 char
 			else if (($tokenType = Symbol::from($ch)) !== null) {
 				$tokens[] = new Token($tokenType, $ch, $this->getLoc());
 				$this->consume();

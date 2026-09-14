@@ -14,9 +14,11 @@ ConstDeclExpr   = "cost" , Identifier , "=" , Expression ;
 VarDeclExpr     = "sia" , Identifier , [ "=" , Expression ] ;
 AssignExpr      = Identifier , "=" , Expression ;
 
-AdditiveExpr    = MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
+AdditiveExpr       = MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
 MultiplicativeExpr = UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
-UnaryExpr       = [ UnaryOperator ] , PrimaryExpr ;
+
+UnaryExpr       = ( "++" | "--" | UnaryOperator ) , UnaryExpr  | PostfixExpr ;
+PostfixExpr     = PrimaryExpr , [ "++" | "--" ] ;
 UnaryOperator   = "-" | "+" ;
 
 PrimaryExpr     = CallExpr

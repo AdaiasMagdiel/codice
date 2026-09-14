@@ -267,6 +267,25 @@ class Interpreter
                     $this->expectType($op, $right, [Intero::class, Decimale::class]);
                     return $this->toCodiceType($right->value * -1);
 
+                case TokenType::INCREMENT:
+                case TokenType::DECREMENT:
+                    if (!$expr->right instanceof Identifier) {
+                        $operation = $op->type === TokenType::INCREMENT
+                            ? 'incremento'
+                            : 'decremento';
+                        throw new RuntimeError("Richiesto un lvalue come operando di {$operation}.", $expr->right->token->loc);
+                    }
+
+                    $this->expectType($op, $right, [Intero::class, Decimale::class]);
+                    $value = $this->toCodiceType(
+                        $op->type === TokenType::INCREMENT
+                            ? $right->value + 1
+                            : $right->value - 1
+                    );
+                    $this->environment->assign($expr->right->token, $value);
+
+                    return $value;
+
                 default:
                     throw new Exception("Operatore unario '{$op->lexeme}' non implementato.\n");
             }

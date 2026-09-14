@@ -7,17 +7,19 @@ use App\Enums\TokenType;
 class Symbol
 {
     private static array $symbols = [
-        ';' => TokenType::SEMICOLON,
-        '(' => TokenType::LEFT_PAREN,
-        ')' => TokenType::RIGHT_PAREN,
-        '{' => TokenType::LEFT_BRACE,
-        '}' => TokenType::RIGHT_BRACE,
-        "," => TokenType::COMMA,
-        "+" => TokenType::PLUS,
-        "-" => TokenType::MINUS,
-        "*" => TokenType::STAR,
-        "/" => TokenType::SLASH,
-        "=" => TokenType::ASSIGN
+        ';'  => TokenType::SEMICOLON,
+        '('  => TokenType::LEFT_PAREN,
+        ')'  => TokenType::RIGHT_PAREN,
+        '{'  => TokenType::LEFT_BRACE,
+        '}'  => TokenType::RIGHT_BRACE,
+        ","  => TokenType::COMMA,
+        "+"  => TokenType::PLUS,
+        "-"  => TokenType::MINUS,
+        "*"  => TokenType::STAR,
+        "/"  => TokenType::SLASH,
+        "="  => TokenType::ASSIGN,
+        "++" => TokenType::INCREMENT,
+        "--" => TokenType::DECREMENT
     ];
 
     public static function from(string $value): ?TokenType

@@ -23,6 +23,8 @@ enum TokenType
 	case STAR;
 	case SLASH;
 	case ASSIGN;
+	case INCREMENT;
+	case DECREMENT;
 
 	case SIA;
 	case COST;

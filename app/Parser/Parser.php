@@ -20,6 +20,7 @@ use App\Ast\Identifier;
 use App\Ast\IfStatement;
 use App\Ast\IntLiteral;
 use App\Ast\NullLiteral;
+use App\Ast\PostfixExpr;
 use App\Ast\UnaryExpr;
 use App\Ast\VarDeclExpr;
 use App\Exceptions\ParseError;
@@ -237,14 +238,33 @@ class Parser
 
     private function parseUnaryExpression(): Expr
     {
-        if ($this->check(TokenType::PLUS) || $this->check(TokenType::MINUS)) {
+        if (
+            $this->check(TokenType::PLUS)      ||
+            $this->check(TokenType::MINUS)     ||
+            $this->check(TokenType::INCREMENT) ||
+            $this->check(TokenType::DECREMENT)
+        ) {
             $op = $this->consume();
-            $right = $this->parsePrimaryExpression();
+            $right = $this->parseUnaryExpression();
 
             return new UnaryExpr($op, $right);
         }
 
-        return $this->parsePrimaryExpression();
+        return $this->parsePostfixExpression();
+    }
+
+    private function parsePostfixExpression(): Expr
+    {
+        $expr = $this->parsePrimaryExpression();
+
+        if (
+            $this->check(TokenType::INCREMENT) ||
+            $this->check(TokenType::DECREMENT)
+        ) {
+            return new PostfixExpr($expr, $this->consume());
+        }
+
+        return $expr;
     }
 
     private function parsePrimaryExpression(): Expr
