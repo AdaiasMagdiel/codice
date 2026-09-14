@@ -7,3 +7,19 @@ stampa("Parentesi: ", (2 + 3) * 4);
 stampa("Meno unario: ", -(-7));
 stampa("Concatenazione: ", "ciao" + " mondo");
 stampa("Ripetizione: ", "ab" * 3);
+
+sia a = 15;
+sia b = 20;
+sia c = 1.5;
+
+stampa("Pré incremento: ", ++a);
+stampa("Pré decremento: ", --b);
+stampa("Pré incremento decimale: ", ++c);
+
+stampa("Post incremento: ", a++);
+stampa("Post decremento: ", b--);
+stampa("Post decremento decimale: ", c--);
+
+stampa("Valore finale di a: ", a);
+stampa("Valore finale di b: ", b);
+stampa("Valore finale di c: ", c);
