@@ -4,7 +4,7 @@ namespace App\Types;
 
 use Override;
 
-class Decimale implements Type
+class Decimale extends Type
 {
     public function __construct(public float $value) {}
 

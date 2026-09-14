@@ -4,7 +4,7 @@ namespace App\Types;
 
 use Override;
 
-class Intero implements Type
+class Intero extends Type
 {
     public function __construct(public int $value) {}
 

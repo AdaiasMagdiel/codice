@@ -2,7 +2,11 @@
 
 namespace App\Types;
 
-interface Type
+abstract class Type
 {
-    public function __toString();
+    abstract public function __toString(): string;
+    public static function is(mixed $value): bool
+    {
+        return $value instanceof static;
+    }
 }

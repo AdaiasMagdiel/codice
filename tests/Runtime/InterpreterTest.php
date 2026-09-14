@@ -432,7 +432,7 @@ it('throws with a hint when a variable declared with a function value is used as
 })->throws(TypeError::class, "'stampa' è una funzione, non un valore booleano. Hai dimenticato di chiamarla con '()'?");
 
 it('throws when a condition evaluates to a value with no boolean conversion', function () {
-    $fakeType = new class implements \App\Types\Type {
+    $fakeType = new class extends \App\Types\Type {
         public function __toString()
         {
             return '<fake>';

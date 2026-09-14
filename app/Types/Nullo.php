@@ -4,7 +4,7 @@ namespace App\Types;
 
 use Override;
 
-class Nullo implements Type
+class Nullo extends Type
 {
     #[Override]
     public function __toString()

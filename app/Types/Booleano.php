@@ -4,7 +4,7 @@ namespace App\Types;
 
 use Override;
 
-class Booleano implements Type
+class Booleano extends Type
 {
     public function __construct(public bool $value) {}
 

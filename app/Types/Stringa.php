@@ -4,7 +4,7 @@ namespace App\Types;
 
 use Override;
 
-class Stringa implements Type
+class Stringa extends Type
 {
     public function __construct(public string $value) {}
 

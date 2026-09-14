@@ -5,7 +5,7 @@ namespace App\Types;
 use Closure;
 use Override;
 
-class Chiamabile implements Type
+class Chiamabile extends Type
 {
     public function __construct(
         public string $name,
