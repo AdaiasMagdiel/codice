@@ -6,7 +6,7 @@ use App\Exceptions\CodiceError;
 use App\Lexer\Scanner;
 use App\Parser\Parser;
 use App\Runtime\Environment;
-use App\Runtime\Interpreter;
+use App\Visitors\Interpreter;
 use Throwable;
 
 class Codice
@@ -14,14 +14,12 @@ class Codice
 	private Scanner $scanner;
 	private Parser $parser;
 	private Interpreter $interpreter;
-	private Environment $environment;
 
 	public function __construct()
 	{
 		$this->scanner = new Scanner();
 		$this->parser = new Parser();
-		$this->interpreter = new Interpreter();
-		$this->environment = new Environment();
+		$this->interpreter = new Interpreter(new Environment());
 	}
 
 	public function runREPL()
@@ -72,7 +70,7 @@ class Codice
 
 			$program = $this->parser->parse();
 
-			$this->interpreter->run($program, $this->environment);
+			$program->accept($this->interpreter);
 		} catch (CodiceError $e) {
 			echo $e;
 			return 1;
