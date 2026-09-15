@@ -163,6 +163,127 @@ it('throws when dividing by zero', function () {
     runInterpreterSource('stampa(10 / 0);');
 })->throws(DivisionByZeroError::class, 'Impossibile dividere per zero.');
 
+it('evaluates the modulo of two integers', function () {
+    expect(runInterpreterSource('stampa(10 % 3);'))->toBe("1" . PHP_EOL);
+});
+
+it('evaluates modulo as zero when evenly divisible', function () {
+    expect(runInterpreterSource('stampa(9 % 3);'))->toBe("0" . PHP_EOL);
+});
+
+it('throws a type error when the left operand of modulo is not an integer', function () {
+    runInterpreterSource('stampa(2.5 % 3);');
+})->throws(TypeError::class, 'Atteso intero, ma trovato decimale.');
+
+it('throws a type error when the right operand of modulo is not an integer', function () {
+    runInterpreterSource('stampa(10 % "a");');
+})->throws(TypeError::class, 'Atteso intero, ma trovato stringa.');
+
+it('throws when taking the modulo by zero', function () {
+    runInterpreterSource('stampa(10 % 0);');
+})->throws(DivisionByZeroError::class, 'Impossibile calcolare il resto della divisione per zero.');
+
+it('evaluates less than between integers', function () {
+    expect(runInterpreterSource('stampa(1 < 2);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates greater than between integers', function () {
+    expect(runInterpreterSource('stampa(5 > 2);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates less than or equal between integers', function () {
+    expect(runInterpreterSource('stampa(2 <= 2);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates greater than or equal between integers', function () {
+    expect(runInterpreterSource('stampa(1 >= 2);'))->toBe("falso" . PHP_EOL);
+});
+
+it('compares strings lexicographically', function () {
+    expect(runInterpreterSource('stampa("a" < "b");'))->toBe("vero" . PHP_EOL);
+});
+
+it('throws a type error when comparing a string with a number', function () {
+    runInterpreterSource('stampa(1 < "a");');
+})->throws(TypeError::class, "Operatore '<' non applicabile tra intero e stringa.");
+
+it('evaluates equality between equal integers as true', function () {
+    expect(runInterpreterSource('stampa(1 == 1);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates equality between different values of the same type as false', function () {
+    expect(runInterpreterSource('stampa(1 == 2);'))->toBe("falso" . PHP_EOL);
+});
+
+it('treats values of different types as never equal', function () {
+    expect(runInterpreterSource('stampa(1 == "1");'))->toBe("falso" . PHP_EOL);
+});
+
+it('evaluates inequality between different integers as true', function () {
+    expect(runInterpreterSource('stampa(1 != 2);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates inequality between equal integers as false', function () {
+    expect(runInterpreterSource('stampa(1 != 1);'))->toBe("falso" . PHP_EOL);
+});
+
+it('treats two nullo values as equal', function () {
+    expect(runInterpreterSource('stampa(nullo == nullo);'))->toBe("vero" . PHP_EOL);
+});
+
+it('treats the same function reference as equal to itself', function () {
+    expect(runInterpreterSource('stampa(stampa == stampa);'))->toBe("vero" . PHP_EOL);
+});
+
+it('treats a function compared with a non-function as not equal', function () {
+    expect(runInterpreterSource('stampa(stampa == 1);'))->toBe("falso" . PHP_EOL);
+});
+
+it('short-circuits && without evaluating the right side when the left is false', function () {
+    expect(runInterpreterSource('stampa(falso && stampa("nao devia rodar"));'))->toBe("falso" . PHP_EOL);
+});
+
+it('evaluates the right side of && when the left is true', function () {
+    expect(runInterpreterSource('stampa(vero && vero);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates && as false when the right side is false', function () {
+    expect(runInterpreterSource('stampa(vero && falso);'))->toBe("falso" . PHP_EOL);
+});
+
+it('short-circuits || without evaluating the right side when the left is true', function () {
+    expect(runInterpreterSource('stampa(vero || stampa("nao devia rodar"));'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates the right side of || when the left is false', function () {
+    expect(runInterpreterSource('stampa(falso || vero);'))->toBe("vero" . PHP_EOL);
+});
+
+it('evaluates || as false when both sides are false', function () {
+    expect(runInterpreterSource('stampa(falso || falso);'))->toBe("falso" . PHP_EOL);
+});
+
+it('runs a for loop from an initial value up to (but excluding) the test bound', function () {
+    expect(runInterpreterSource('per (sia i = 0; i < 3; i++) { stampa(i); }'))
+        ->toBe("0" . PHP_EOL . "1" . PHP_EOL . "2" . PHP_EOL);
+});
+
+it('throws when postfix increment is applied to something that is not an lvalue', function () {
+    runInterpreterSource('stampa(1++);');
+})->throws(RuntimeError::class, 'Richiesto un lvalue come operando di incremento.');
+
+it('throws when postfix decrement is applied to something that is not an lvalue', function () {
+    runInterpreterSource('stampa(1--);');
+})->throws(RuntimeError::class, 'Richiesto un lvalue come operando di decremento.');
+
+it('throws when prefix increment is applied to something that is not an lvalue', function () {
+    runInterpreterSource('stampa(++1);');
+})->throws(RuntimeError::class, 'Richiesto un lvalue come operando di incremento.');
+
+it('throws when prefix decrement is applied to something that is not an lvalue', function () {
+    runInterpreterSource('stampa(--1);');
+})->throws(RuntimeError::class, 'Richiesto un lvalue come operando di decremento.');
+
 it('gives multiplication higher precedence than addition', function () {
     expect(runInterpreterSource('stampa(2 + 3 * 4);'))->toBe("14" . PHP_EOL);
 });

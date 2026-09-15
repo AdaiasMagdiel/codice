@@ -458,3 +458,83 @@ it('reports a parse error for a dangling else with no matching if', function () 
 it('reports a parse error for a dangling else inside a block', function () {
     parseParserSource('{ altrimenti { 1; } }');
 })->throws(ParseError::class, "'altrimenti' senza un 'se' corrispondente.");
+
+it('parses a logical or expression', function () {
+    $program = parseParserSource('vero || falso;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::OR)
+        ->and($expr->left)->toBeInstanceOf(BoolLiteral::class)
+        ->and($expr->right)->toBeInstanceOf(BoolLiteral::class);
+});
+
+it('parses a logical and expression', function () {
+    $program = parseParserSource('vero && falso;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::AND)
+        ->and($expr->left)->toBeInstanceOf(BoolLiteral::class)
+        ->and($expr->right)->toBeInstanceOf(BoolLiteral::class);
+});
+
+it('gives logical and higher precedence than logical or', function () {
+    $program = parseParserSource('vero || falso && falso;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::OR)
+        ->and($expr->right)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->right->op->type)->toBe(TokenType::AND);
+});
+
+it('parses an equality expression', function () {
+    $program = parseParserSource('1 == 1;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::EQUAL);
+});
+
+it('parses an inequality expression', function () {
+    $program = parseParserSource('1 != 2;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::NOT_EQUAL);
+});
+
+it('gives equality lower precedence than relational operators', function () {
+    $program = parseParserSource('1 < 2 == vero;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::EQUAL)
+        ->and($expr->left)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->left->op->type)->toBe(TokenType::LESS);
+});
+
+it('parses a greater than expression', function () {
+    $program = parseParserSource('5 > 2;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::GREATER);
+});
+
+it('parses a less than or equal expression', function () {
+    $program = parseParserSource('5 <= 2;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::LESS_EQUAL);
+});
+
+it('parses a greater than or equal expression', function () {
+    $program = parseParserSource('5 >= 2;');
+    $expr = $program->statements[0]->expr;
+
+    expect($expr)->toBeInstanceOf(BinaryExpr::class)
+        ->and($expr->op->type)->toBe(TokenType::GREATER_EQUAL);
+});
