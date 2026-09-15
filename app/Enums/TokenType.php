@@ -22,6 +22,7 @@ enum TokenType
 	case MINUS;
 	case STAR;
 	case SLASH;
+	case MOD;
 	case ASSIGN;
 	case INCREMENT;
 	case DECREMENT;

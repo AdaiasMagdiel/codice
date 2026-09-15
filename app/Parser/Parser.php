@@ -10,6 +10,7 @@ use App\Ast\CallExpr;
 use App\Ast\ConstDeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
+use App\Ast\ForStatement;
 use App\Enums\TokenType;
 use App\Interfaces\Expr;
 use App\Interfaces\Stmt;
@@ -97,6 +98,10 @@ class Parser
             return $this->parseIfStatement();
         }
 
+        if ($this->check(TokenType::PER)) {
+            return $this->parseForStatement();
+        }
+
         if ($this->check(TokenType::ALTRIMENTI)) {
             throw new ParseError(
                 "'altrimenti' senza un 'se' corrispondente.",
@@ -131,6 +136,39 @@ class Parser
         }
 
         return new IfStatement($expr, $then, $else);
+    }
+
+    private function parseForStatement(): Stmt
+    {
+        $this->expect(TokenType::PER);
+        $this->expect(TokenType::LEFT_PAREN);
+
+        $setup = new NullLiteral(new Token(TokenType::NULL, "nullo", $this->peek()->loc));
+        if (!$this->check(TokenType::SEMICOLON)) {
+            $setup = $this->parseExpression();
+        }
+        $this->expect(TokenType::SEMICOLON);
+
+        $test = new BoolLiteral(new Token(TokenType::BOOL, "vero", $this->peek()->loc));
+        if (!$this->check(TokenType::SEMICOLON)) {
+            $test = $this->parseExpression();
+        }
+        $this->expect(TokenType::SEMICOLON);
+
+        $update = new NullLiteral(new Token(TokenType::NULL, "nullo", $this->peek()->loc));
+        if (!$this->check(TokenType::RIGHT_PAREN)) {
+            $update = $this->parseExpression();
+        }
+        $this->expect(TokenType::RIGHT_PAREN);
+
+        $body = $this->parseBlock();
+
+        return new ForStatement(
+            $setup,
+            $test,
+            $update,
+            $body
+        );
     }
 
     private function parseBlock(): Stmt
@@ -294,7 +332,11 @@ class Parser
     {
         $expr = $this->parseUnaryExpression();
 
-        while ($this->check(TokenType::STAR) || $this->check(TokenType::SLASH)) {
+        while (
+            $this->check(TokenType::STAR)  ||
+            $this->check(TokenType::SLASH) ||
+            $this->check(TokenType::MOD)
+        ) {
             $op = $this->consume();
             $right = $this->parseUnaryExpression();
 

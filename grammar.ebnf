@@ -4,7 +4,7 @@ Statement       = IfStatement | ForStatement | Block | ExprStatement ;
 
 ExprStatement   = Expression , ";" ;
 IfStatement     = "se" , "(" , Expression , ")" , Block , [ "altrimenti" , ( IfStatement | Block) ] ;
-ForStatement    = "per" , "(" , [ VarDeclExpr | Expression ] , ";" , [ Expression ] , ";" , [ Expression ] , ")" , Block ;
+ForStatement    = "per" , "(" , [ Expression ] , ";" , [ Expression ] , ";" , [ Expression ] , ")" , Block ;
 
 Block           = "{" , { Statement } , "}" ;
 
@@ -19,7 +19,7 @@ LogicalAndExpr     = EqualityExpr , { "&&" , EqualityExpr } ;
 EqualityExpr       = RelationalExpr , { ( "==" | "!=" ) , RelationalExpr } ;
 RelationalExpr     = AdditiveExpr , { ( RelationalOperator ) , AdditiveExpr } ;
 AdditiveExpr       = MultiplicativeExpr , { ( "+" | "-" ) , MultiplicativeExpr } ;
-MultiplicativeExpr = UnaryExpr , { ( "*" | "/" ) , UnaryExpr } ;
+MultiplicativeExpr = UnaryExpr , { ( "*" | "/" | "%" ) , UnaryExpr } ;
 
 UnaryExpr       = ( "++" | "--" | UnaryOperator ) , UnaryExpr  | PostfixExpr ;
 PostfixExpr     = PrimaryExpr , [ "++" | "--" ] ;

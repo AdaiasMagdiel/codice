@@ -17,6 +17,7 @@ class Symbol
         "-"  => TokenType::MINUS,
         "*"  => TokenType::STAR,
         "/"  => TokenType::SLASH,
+        "%"  => TokenType::MOD,
         "="  => TokenType::ASSIGN,
         "++" => TokenType::INCREMENT,
         "--" => TokenType::DECREMENT,

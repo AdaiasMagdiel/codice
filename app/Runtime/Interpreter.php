@@ -11,6 +11,7 @@ use App\Ast\ConstDeclExpr;
 use App\Ast\DeclExpr;
 use App\Ast\ExprStatement;
 use App\Ast\FloatLiteral;
+use App\Ast\ForStatement;
 use App\Ast\Identifier;
 use App\Ast\IfStatement;
 use App\Ast\IntLiteral;
@@ -145,6 +146,10 @@ class Interpreter
             return $this->runIfStatement($statement);
         }
 
+        if ($statement instanceof ForStatement) {
+            return $this->runForStatement($statement);
+        }
+
         if ($statement instanceof Block) {
             return $this->runBlock($statement);
         }
@@ -167,6 +172,33 @@ class Interpreter
             $this->runStatement($stmt->else);
         }
 
+        return new Nullo();
+    }
+
+    private function runForStatement(ForStatement $stmt): Nullo
+    {
+        $enclosingEnv = $this->environment;
+        $this->environment = new Environment($enclosingEnv);
+
+        if ($stmt->setup) $this->runExpression($stmt->setup);
+
+        while (true) {
+            if ($stmt->test) {
+                $value = $this->runExpression($stmt->test);
+                if (!$this->toBool(
+                    $value,
+                    fn() => $this->exprToken($stmt->test)
+                )->value) {
+                    break;
+                }
+            }
+
+            $this->runBlock($stmt->body);
+
+            if ($stmt->update) $this->runExpression($stmt->update);
+        }
+
+        $this->environment = $enclosingEnv;
         return new Nullo();
     }
 
@@ -464,6 +496,21 @@ class Interpreter
                     };
 
                     return $this->toCodiceType($op->type === TokenType::EQUAL ? $equal : !$equal);
+
+                case TokenType::MOD:
+                    $this->expectType($op, [$left, $right], Intero::class);
+
+                    /** @var Intero $left */
+                    /** @var Intero $right */
+
+                    if ($right->value === 0) {
+                        throw new DivisionByZeroError(
+                            "Impossibile calcolare il resto della divisione per zero.",
+                            $op->loc
+                        );
+                    }
+
+                    return new Intero($left->value % $right->value);
 
                 default:
                     throw new Exception("Operatore binario '{$op->lexeme}' non implementato.\n");
