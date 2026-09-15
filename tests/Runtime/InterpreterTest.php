@@ -9,16 +9,13 @@ use App\Enums\TokenType;
 use App\Exceptions\DivisionByZeroError;
 use App\Exceptions\RuntimeError;
 use App\Exceptions\TypeError;
-use App\Interfaces\Expr;
-use App\Interfaces\Stmt;
 use App\Lexer\Loc;
 use App\Lexer\Scanner;
 use App\Lexer\Token;
 use App\Parser\Parser;
 use App\Runtime\Environment;
-use App\Runtime\Interpreter;
+use App\Visitors\Interpreter;
 use App\Types\Chiamabile;
-use App\Types\Nullo;
 
 function runInterpreterSource(string $source): string
 {
@@ -29,12 +26,12 @@ function runInterpreterSource(string $source): string
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
     $environment = new Environment();
+    $interpreter = new Interpreter($environment);
 
     ob_start();
     try {
-        $interpreter->run($program, $environment);
+        $program->accept($interpreter);
         return ob_get_clean();
     } catch (\Throwable $e) {
         ob_end_clean();
@@ -306,17 +303,7 @@ it('evaluates a string literal expression statement without touching the environ
 });
 
 it('resolves an identifier bound in the environment', function () {
-    $scanner = new Scanner();
-    $scanner->init('test.cod', 'stampa;');
-
-    $parser = new Parser();
-    $parser->init($scanner->scan());
-    $program = $parser->parse();
-
-    $interpreter = new Interpreter();
-    $environment = new Environment();
-
-    expect($interpreter->run($program, $environment))->toBeInstanceOf(Nullo::class);
+    expect(fn() => runInterpreterSource('stampa;'))->not->toThrow(RuntimeError::class);
 });
 
 it('throws when calling an undefined function', function () {
@@ -428,7 +415,7 @@ it('throws when assigning to an identifier declared only after the assignment', 
 })->throws(RuntimeError::class, "Identificatore 'x' non definito.");
 
 it('allows reassigning the name of a builtin function, shadowing it', function () {
-    expect(fn () => runInterpreterSource('stampa = 5;'))->not->toThrow(RuntimeError::class);
+    expect(fn() => runInterpreterSource('stampa = 5;'))->not->toThrow(RuntimeError::class);
 });
 
 it('throws when calling a builtin function after it was shadowed by an assignment', function () {
@@ -450,9 +437,9 @@ it('throws when calling something that is not a function', function () {
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
+    $interpreter = new Interpreter($environment);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(RuntimeError::class, "Atteso che 'naoFuncao' fosse una funzione.");
 });
 
@@ -529,7 +516,7 @@ it('throws with a hint when a bare identifier naming a function is used as a con
 
 it('throws with a hint when a call result that is itself a function is used as a condition', function () {
     $environment = new Environment();
-    $environment->globals['pegaFuncao'] = new Chiamabile('pegaFuncao', fn () => $environment->globals['stampa']);
+    $environment->globals['pegaFuncao'] = new Chiamabile('pegaFuncao', fn() => $environment->globals['stampa']);
 
     $scanner = new Scanner();
     $scanner->init('test.cod', 'se (pegaFuncao()) { stampa("sim"); }');
@@ -538,9 +525,9 @@ it('throws with a hint when a call result that is itself a function is used as a
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
+    $interpreter = new Interpreter($environment);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(TypeError::class, "'stampa' è una funzione, non un valore booleano. Hai dimenticato di chiamarla con '()'?");
 });
 
@@ -561,7 +548,7 @@ it('throws when a condition evaluates to a value with no boolean conversion', fu
     };
 
     $environment = new Environment();
-    $environment->globals['valorFalso'] = new Chiamabile('valorFalso', fn () => $fakeType);
+    $environment->globals['valorFalso'] = new Chiamabile('valorFalso', fn() => $fakeType);
 
     $scanner = new Scanner();
     $scanner->init('test.cod', 'se (valorFalso()) { stampa("sim"); }');
@@ -570,10 +557,10 @@ it('throws when a condition evaluates to a value with no boolean conversion', fu
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
+    $interpreter = new Interpreter($environment);
     $class = get_class($fakeType);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(Exception::class, "Impossibile convertire '{$class}' in booleano.\n");
 });
 
@@ -612,7 +599,7 @@ it('throws when assigning inside a block to an identifier that was never declare
 
 it('wraps a native bool return value from a builtin into a Booleano', function () {
     $environment = new Environment();
-    $environment->globals['ehVero'] = new Chiamabile('ehVero', fn () => true);
+    $environment->globals['ehVero'] = new Chiamabile('ehVero', fn() => true);
 
     $scanner = new Scanner();
     $scanner->init('test.cod', 'stampa(ehVero());');
@@ -621,10 +608,10 @@ it('wraps a native bool return value from a builtin into a Booleano', function (
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
+    $interpreter = new Interpreter($environment);
 
     ob_start();
-    $interpreter->run($program, $environment);
+    $program->accept($interpreter);
     $output = ob_get_clean();
 
     expect($output)->toBe('vero' . PHP_EOL);
@@ -632,7 +619,7 @@ it('wraps a native bool return value from a builtin into a Booleano', function (
 
 it('throws when a builtin returns a native value with no Codice equivalent', function () {
     $environment = new Environment();
-    $environment->globals['lista'] = new Chiamabile('lista', fn () => ['a', 'b']);
+    $environment->globals['lista'] = new Chiamabile('lista', fn() => ['a', 'b']);
 
     $scanner = new Scanner();
     $scanner->init('test.cod', 'lista();');
@@ -641,9 +628,9 @@ it('throws when a builtin returns a native value with no Codice equivalent', fun
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
+    $interpreter = new Interpreter($environment);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(Exception::class, "Impossibile convertire il valore nativo di tipo 'array' in un Type di Codice.\n");
 });
 
@@ -653,10 +640,10 @@ it('throws when a unary operator has no implementation', function () {
     $expr = new UnaryExpr($op, new IntLiteral(new Token(TokenType::INT, 1, $loc)));
     $program = new Program([new ExprStatement($expr)]);
 
-    $interpreter = new Interpreter();
     $environment = new Environment();
+    $interpreter = new Interpreter($environment);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(Exception::class, "Operatore unario '*' non implementato.\n");
 });
 
@@ -668,35 +655,9 @@ it('throws when a binary operator has no implementation', function () {
     $expr = new BinaryExpr($left, $op, $right);
     $program = new Program([new ExprStatement($expr)]);
 
-    $interpreter = new Interpreter();
     $environment = new Environment();
+    $interpreter = new Interpreter($environment);
 
-    expect(fn () => $interpreter->run($program, $environment))
+    expect(fn() => $program->accept($interpreter))
         ->toThrow(Exception::class, "Operatore binario '=' non implementato.\n");
-});
-
-it('throws when an expression has no implementation', function () {
-    $expr = new class implements Expr {};
-    $program = new Program([new ExprStatement($expr)]);
-
-    $interpreter = new Interpreter();
-    $environment = new Environment();
-
-    $class = get_class($expr);
-
-    expect(fn () => $interpreter->run($program, $environment))
-        ->toThrow(Exception::class, "Espressione inattesa '{$class}'.\n");
-});
-
-it('throws when a statement has no implementation', function () {
-    $statement = new class implements Stmt {};
-    $program = new Program([$statement]);
-
-    $interpreter = new Interpreter();
-    $environment = new Environment();
-
-    $class = get_class($statement);
-
-    expect(fn () => $interpreter->run($program, $environment))
-        ->toThrow(Exception::class, "Istruzione inattesa '{$class}'.\n");
 });

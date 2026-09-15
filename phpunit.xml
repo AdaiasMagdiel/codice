@@ -13,10 +13,12 @@
     <source>
         <include>
             <directory>app/Ast</directory>
+            <directory>app/Interfaces</directory>
             <directory>app/Lexer</directory>
             <directory>app/Parser</directory>
             <directory>app/Runtime</directory>
             <directory>app/Types</directory>
+            <directory>app/Visitors</directory>
         </include>
     </source>
 </phpunit>

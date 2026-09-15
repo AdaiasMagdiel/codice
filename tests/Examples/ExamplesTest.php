@@ -3,7 +3,7 @@
 use App\Lexer\Scanner;
 use App\Parser\Parser;
 use App\Runtime\Environment;
-use App\Runtime\Interpreter;
+use App\Visitors\Interpreter;
 
 function runExampleFile(string $path): string
 {
@@ -14,12 +14,12 @@ function runExampleFile(string $path): string
     $parser->init($scanner->scan());
     $program = $parser->parse();
 
-    $interpreter = new Interpreter();
     $environment = new Environment();
+    $interpreter = new Interpreter($environment);
 
     ob_start();
     try {
-        $interpreter->run($program, $environment);
+        $program->accept($interpreter);
         return ob_get_clean();
     } catch (\Throwable $e) {
         ob_end_clean();
