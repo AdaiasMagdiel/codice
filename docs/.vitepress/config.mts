@@ -36,6 +36,7 @@ export default defineConfig({
             { text: 'Primitive types', link: '/guide/types' },
             { text: 'Variables', link: '/guide/variables' },
             { text: 'Conditionals', link: '/guide/conditionals' },
+            { text: 'Loops', link: '/guide/loops' },
             { text: 'Math operations', link: '/guide/operations' },
             { text: 'Strings', link: '/guide/strings' },
             { text: 'Comments', link: '/guide/comments' },
@@ -75,7 +76,7 @@ export default defineConfig({
         aliases: ['cod'],
         scopeName: 'source.cod',
         patterns: [
-          { match: '\\b(sia|cost|stampa|vero|falso|nullo|esci|se|altrimenti)\\b', name: 'keyword.control.cod' },
+          { match: '\\b(sia|cost|stampa|vero|falso|nullo|esci|se|altrimenti|per)\\b', name: 'keyword.control.cod' },
           { match: '\\b(stringa|intero|decimale|booleano)\\b', name: 'storage.type.cod' },
           { match: '"[^"]*"', name: 'string.quoted.double.cod' },
           { match: '\\b\\d+(\\.\\d+)?\\b', name: 'constant.numeric.cod' },

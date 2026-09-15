@@ -27,7 +27,7 @@ Source code goes through three stages before being executed:
 
 The project is in its early stages. The pipeline runs end-to-end: the lexer tokenizes source code, the parser builds an AST, and a tree-walking interpreter executes it.
 
-Currently supported: literals, identifiers, variables, function calls (`stampa` is the only built-in), and arithmetic expressions.
+Currently supported: literals, identifiers, variables and constants, function calls (`stampa` is the only built-in), arithmetic/comparison/logical expressions, conditionals (`se`/`altrimenti`/`altrimenti se`) and loops (`per`). There are still no user-defined functions.
 
 ::: info
 Nothing here should be considered stable or production-ready.

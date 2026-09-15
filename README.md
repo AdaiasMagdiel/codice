@@ -8,9 +8,9 @@ Codice is a small programming language with keywords in Italian. It has no real-
 
 Written in PHP, it is deliberately simple and unfinished in places. Expect rough edges.
 
-📖 **[Read the full documentation](https://adaiasmagdiel.github.io/codice/)** for a guided tour of the language — types, variables, conditionals, operations, strings, comments and built-ins.
+📖 **[Read the full documentation](https://adaiasmagdiel.github.io/codice/)** for a guided tour of the language — types, variables, conditionals, loops, operations, strings, comments and built-ins.
 
-`.cod` files get syntax highlighting on GitHub via [AdaiasMagdiel/codice-syntax-highlight](https://github.com/AdaiasMagdiel/codice-syntax-highlight).
+`.cod` files get syntax highlighting in Sublime Text via [AdaiasMagdiel/codice-syntax-highlight](https://github.com/AdaiasMagdiel/codice-syntax-highlight).
 
 ## Example
 
@@ -25,11 +25,11 @@ $ php codice.php examples/ciao_mondo.cod
 Ciao, mondo!
 ```
 
-Arithmetic operators are supported too — `+`, `-`, `*`, `/`, unary `+`/`-`,
-with the usual precedence and parentheses for grouping. `+` also
-concatenates when either operand is a `stringa`, and `*` repeats a string
-when the other operand is an `intero`. See
-[examples/operations.cod](examples/operations.cod):
+Arithmetic operators are supported too — `+`, `-`, `*`, `/`, `%` (modulo,
+integers only), unary `+`/`-`, and prefix/postfix `++`/`--`, with the usual
+precedence and parentheses for grouping. `+` also concatenates when either
+operand is a `stringa`, and `*` repeats a string when the other operand is
+an `intero`. See [examples/operations.cod](examples/operations.cod):
 
 ```sh
 $ php codice.php examples/operations.cod
@@ -63,6 +63,48 @@ Entra in questo ramo, tramite 'altrimenti se'.
 Fuori.
 Dentro.
 Dentro il blocco: solo qui dentro
+```
+
+Loops are supported through `per` (for) — an optional setup, test and
+update, separated by `;`, with a `{ }` block as its body that gets its own
+scope on every iteration. Combined with comparison (`<`, `>`, `<=`, `>=`,
+`==`, `!=`) and logical (`&&`, `||`, both short-circuiting) operators,
+that's enough for a real program. See
+[examples/fizzbuzz.cod](examples/fizzbuzz.cod):
+
+```
+per (sia i = 0; i < 1000; i++) {
+    se (i % 3 == 0 && i % 5 == 0) {
+        stampa("FizzBuzz");
+    } altrimenti se (i % 3 == 0) {
+        stampa("Fizz");
+    } altrimenti se (i % 5 == 0) {
+        stampa("Buzz");
+    } altrimenti {
+        stampa(i);
+    }
+}
+```
+
+```sh
+$ php codice.php examples/fizzbuzz.cod
+FizzBuzz
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+...
 ```
 
 ## Usage
@@ -116,14 +158,16 @@ AST directly. Values are represented by a small runtime type system
 (null — also the default return value of any function call), `intero`
 (integer) and `decimale` (float, using `.` as the decimal separator — see
 [Decimal separator](#decimal-separator)). Beyond literals, function calls —
-`stampa` (print) is the only builtin — and arithmetic expressions (`+`, `-`,
-`*`, `/`, unary `+`/`-`), variables and constants are supported: `sia`
-declares a variable, `cost` declares a constant (always requires an initial
-value, and can never be reassigned), and an already-declared variable can be
-reassigned with `=`. Functions are values like any other, so they can be
-assigned to a variable and called through it. Control flow is available
-through `se`/`altrimenti`/`altrimenti se` (if/else/else-if), and any `{ }` block —
-attached to an `se` or standalone — introduces its own lexical scope. See
+`stampa` (print) is the only builtin — arithmetic (`+`, `-`, `*`, `/`, `%`,
+unary `+`/`-`, `++`/`--`), comparison (`<`, `>`, `<=`, `>=`, `==`, `!=`) and
+logical (`&&`, `||`) expressions, variables and constants are supported:
+`sia` declares a variable, `cost` declares a constant (always requires an
+initial value, and can never be reassigned), and an already-declared
+variable can be reassigned with `=`. Functions are values like any other,
+so they can be assigned to a variable and called through it. Control flow
+is available through `se`/`altrimenti`/`altrimenti se` (if/else/else-if) and
+`per` (for), and any `{ }` block — attached to a statement or standalone —
+introduces its own lexical scope. See
 [examples/assegnamenti.cod](examples/assegnamenti.cod):
 
 ```sh
@@ -140,7 +184,7 @@ Fantastico!
 PI vale: 3.1415926535898
 ```
 
-There are still no loops and no user-defined functions yet.
+There are still no user-defined functions yet.
 
 ## Documentation
 
@@ -153,6 +197,7 @@ of the language in more depth than this README:
 - [Primitive types](https://adaiasmagdiel.github.io/codice/guide/types)
 - [Variables](https://adaiasmagdiel.github.io/codice/guide/variables)
 - [Conditionals](https://adaiasmagdiel.github.io/codice/guide/conditionals)
+- [Loops](https://adaiasmagdiel.github.io/codice/guide/loops)
 - [Math operations](https://adaiasmagdiel.github.io/codice/guide/operations)
 - [Strings](https://adaiasmagdiel.github.io/codice/guide/strings)
 - [Comments](https://adaiasmagdiel.github.io/codice/guide/comments)
