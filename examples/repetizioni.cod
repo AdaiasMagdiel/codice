@@ -1,0 +1,29 @@
+// "per" ripete un blocco: ha una fase di inizializzazione, una condizione
+// di continuazione e un aggiornamento, eseguiti tra parentesi e separati
+// da ";", esattamente come in molti altri linguaggi.
+per (sia i = 0; i < 5; i++) {
+	stampa("i vale: ", i);
+}
+
+// Il conteggio può anche andare a ritroso, usando "--" al posto di "++".
+per (sia j = 5; j > 0; j--) {
+	stampa("j vale: ", j);
+}
+
+// Ognuna delle tre parti è opzionale (verrebbe omessa lasciando solo il
+// ";"). Omettendo la condizione, ad esempio, il ciclo continuerebbe
+// all'infinito, quindi qui non lo facciamo.
+
+// I cicli possono essere annidati: ogni "per" ha il proprio scope, quindi
+// la variabile del ciclo esterno resta visibile in quello interno.
+per (sia riga = 0; riga < 3; riga++) {
+	per (sia colonna = 0; colonna < 2; colonna++) {
+		stampa("(", riga, ", ", colonna, ")");
+	}
+}
+
+// Il corpo del ciclo può combinarsi con qualsiasi altra espressione, come
+// la ripetizione di stringhe vista in "operations.cod".
+per (sia livello = 1; livello <= 3; livello++) {
+	stampa("*" * livello);
+}

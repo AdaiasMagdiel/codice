@@ -1,0 +1,11 @@
+per (sia i = 0; i < 1000; i++) {
+    se (i % 3 == 0 && i % 5 == 0) {
+        stampa("FizzBuzz");
+    } altrimenti se (i % 3 == 0) {
+        stampa("Fizz");
+    } altrimenti se (i % 5 == 0) {
+        stampa("Buzz");
+    } altrimenti {
+        stampa(i);
+    }
+}

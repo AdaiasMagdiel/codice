@@ -1,0 +1,12 @@
+Questo blocco viene sempre eseguito.
+La condizione era falsa, quindi eseguo questo blocco.
+0 è falso: entro nel ramo altrimenti.
+1 è vero: qualsiasi intero diverso da zero lo è.
+0.0 è falso, come 0.
+Una stringa vuota è falsa.
+Una stringa non vuota è vera.
+nullo è sempre falso.
+Entra in questo ramo, tramite 'altrimenti se'.
+Fuori.
+Dentro.
+Dentro il blocco: solo qui dentro

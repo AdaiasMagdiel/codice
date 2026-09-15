@@ -1,0 +1,18 @@
+Somma: 3
+Sottrazione: 7
+Moltiplicazione: 12
+Divisione: 2.5
+Precedenza: 14
+Parentesi: 20
+Meno unario: 7
+Concatenazione: ciao mondo
+Ripetizione: ababab
+Pré incremento: 16
+Pré decremento: 19
+Pré incremento decimale: 2.5
+Post incremento: 16
+Post decremento: 19
+Post decremento decimale: 2.5
+Valore finale di a: 17
+Valore finale di b: 18
+Valore finale di c: 1.5

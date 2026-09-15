@@ -30,8 +30,17 @@ function runExampleFile(string $path): string
 $examples = glob(__DIR__ . '/../../examples/*.cod');
 
 foreach ($examples as $file) {
-    it('runs ' . basename($file) . ' without errors', function () use ($file) {
-        expect(runExampleFile($file))->not->toBe('');
+    $name = basename($file);
+    $expectedFile = substr($file, 0, -4) . '.out';
+
+    // An example without a matching .out isn't ready yet (e.g. still a
+    // work in progress), so we skip registering a test for it entirely.
+    if (!file_exists($expectedFile)) {
+        continue;
+    }
+
+    it("runs {$name} and matches its expected output", function () use ($file, $expectedFile) {
+        expect(runExampleFile($file))->toBe(file_get_contents($expectedFile));
     });
 }
 
