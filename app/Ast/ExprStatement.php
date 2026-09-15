@@ -2,10 +2,18 @@
 
 namespace App\Ast;
 
-use App\Interfaces\Expr;
-use App\Interfaces\Stmt;
+use App\Ast\Expr;
+use App\Ast\Stmt;
+use App\Visitors\Visitor;
+use Override;
 
-class ExprStatement implements Stmt
+class ExprStatement extends Stmt
 {
     public function __construct(public Expr $expr) {}
+
+    #[Override]
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitExprStatement($this);
+    }
 }

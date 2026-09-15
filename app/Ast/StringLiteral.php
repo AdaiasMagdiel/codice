@@ -2,4 +2,14 @@
 
 namespace App\Ast;
 
-class StringLiteral extends Literal {}
+use App\Visitors\Visitor;
+use Override;
+
+class StringLiteral extends Literal
+{
+    #[Override]
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitStringLiteral($this);
+    }
+}

@@ -2,4 +2,14 @@
 
 namespace App\Ast;
 
-class FloatLiteral extends Literal {}
+use App\Visitors\Visitor;
+use Override;
+
+class FloatLiteral extends Literal
+{
+    #[Override]
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitFloatLiteral($this);
+    }
+}

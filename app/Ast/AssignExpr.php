@@ -2,13 +2,21 @@
 
 namespace App\Ast;
 
-use App\Interfaces\Expr;
+use App\Ast\Expr;
+use App\Visitors\Visitor;
 use App\Lexer\Token;
+use Override;
 
-class AssignExpr implements Expr
+class AssignExpr extends Expr
 {
     public function __construct(
         public Token $identifier,
         public Expr $value
     ) {}
+
+    #[Override]
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitAssignExpr($this);
+    }
 }

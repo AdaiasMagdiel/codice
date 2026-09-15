@@ -2,10 +2,12 @@
 
 namespace App\Ast;
 
-use App\Interfaces\Expr;
-use App\Interfaces\Stmt;
+use App\Ast\Expr;
+use App\Ast\Stmt;
+use App\Visitors\Visitor;
+use Override;
 
-class ForStatement implements Stmt
+class ForStatement extends Stmt
 {
     public function __construct(
         public ?Expr $setup,
@@ -13,4 +15,10 @@ class ForStatement implements Stmt
         public ?Expr $update,
         public Block $body
     ) {}
+
+    #[Override]
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visitForStatement($this);
+    }
 }
