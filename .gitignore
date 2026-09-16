@@ -12,3 +12,7 @@ docs/.vitepress/dist/
 bytecode/codice
 bytecode/nob
 bytecode/nob.old
+bytecode/nob.exe
+bytecode/nob.exe.old
+bytecode/dist/
+bytecode/output/
