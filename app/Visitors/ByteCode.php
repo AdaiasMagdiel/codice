@@ -17,8 +17,9 @@ define('MAGIC_NUMBER', (MAGIC_SIGNATURE << 8) | BYTECODE_VERSION);
 
 enum TYPE: int
 {
-    case INT = 0x01;
-    case STR = 0x02;
+    case NULL = 0x01;
+    case INT  = 0x02;
+    case STR  = 0x03;
 }
 
 enum OP: int
@@ -56,9 +57,9 @@ class ByteCode implements Visitor
         return pack("N", $value);
     }
 
-    private function c_string(string $value): string
+    private function string(string $value): string
     {
-        return pack("a*", $value . "\0");
+        return pack("a*", $value);
     }
 
     private function addInstruction(OP $op)
@@ -95,7 +96,7 @@ class ByteCode implements Visitor
         foreach ($this->pool as $key => $item) {
             $value = match ($item[1]) {
                 TYPE::INT => $this->uint_32((int) $key),
-                TYPE::STR => $this->uint_32(strlen($key)) . $this->c_string($key),
+                TYPE::STR => $this->uint_32(strlen($key)) . $this->string($key),
                 default => throw new Exception("Not implemented: " . $item[1]->name),
             };
 
