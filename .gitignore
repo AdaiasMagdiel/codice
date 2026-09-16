@@ -7,3 +7,8 @@
 node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+# bytecode prototype build artifacts
+bytecode/codice
+bytecode/nob
+bytecode/nob.old

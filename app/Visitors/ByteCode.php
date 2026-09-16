@@ -24,8 +24,9 @@ enum TYPE: int
 enum OP: int
 {
     case LOAD_CONST = 0x01;
-    case PUSH = 0x02;
-    case ADD  = 0x03;
+    case PUSH       = 0x02;
+    case ADD        = 0x03;
+    case CALL_FUNC  = 0x04;
 }
 
 class ByteCode implements Visitor
@@ -60,6 +61,21 @@ class ByteCode implements Visitor
         return pack("a*", $value . "\0");
     }
 
+    private function addInstruction(OP $op)
+    {
+        $this->buffer .= $this->uint_8($op->value);
+    }
+
+    private function addToPool(mixed $value, TYPE $type): void
+    {
+        if (!array_key_exists($value, $this->pool)) {
+            $this->pool[(string) $value] = [$this->poolPos++, $type];
+        }
+
+        $this->addInstruction(OP::LOAD_CONST);
+        $this->buffer .= $this->uint_16($this->pool[(string) $value][0]);
+    }
+
     #[Override]
     public function visitProgram(Ast\Program $program)
     {
@@ -91,6 +107,22 @@ class ByteCode implements Visitor
     }
 
     #[Override]
+    public function visitCallExpr(Ast\CallExpr $expr)
+    {
+        $count = count($expr->args);
+
+        for ($i = $count - 1; $i >= 0; $i--) {
+            $expr->args[$i]->accept($this);
+        }
+
+        $this->addToPool($count, TYPE::INT);
+        $this->addToPool($expr->callee->lexeme, TYPE::STR);
+
+        $this->addInstruction(OP::CALL_FUNC);
+    }
+
+
+    #[Override]
     public function visitExprStatement(Ast\ExprStatement $stmt)
     {
         return $stmt->expr->accept($this);
@@ -106,7 +138,7 @@ class ByteCode implements Visitor
 
         switch ($op->type) {
             case TokenType::PLUS:
-                $this->buffer .= $this->uint_8(OP::ADD->value);
+                $this->addInstruction(OP::ADD);
                 break;
         }
     }
@@ -114,34 +146,27 @@ class ByteCode implements Visitor
     #[Override]
     public function visitIntLiteral(Ast\IntLiteral $expr)
     {
-        if (!array_key_exists($expr->token->lexeme, $this->pool)) {
-            $this->pool[(string) $expr->token->lexeme] = [$this->poolPos++, TYPE::INT];
-        }
-
-        $this->buffer .= $this->uint_8(OP::LOAD_CONST->value);
-        $this->buffer .= $this->uint_16($this->pool[(string) $expr->token->lexeme][0]);
+        $this->addToPool($expr->token->lexeme, TYPE::INT);
     }
 
     #[Override]
     public function visitStringLiteral(Ast\StringLiteral $expr)
     {
-        if (!array_key_exists($expr->token->lexeme, $this->pool)) {
-            $this->pool[$expr->token->lexeme] = [$this->poolPos++, TYPE::STR];
-        }
-
-        $this->buffer .= $this->uint_8(OP::LOAD_CONST->value);
-        $this->buffer .= $this->uint_16($this->pool[(string) $expr->token->lexeme][0]);
+        $this->addToPool($expr->token->lexeme, TYPE::STR);
     }
 
+    #[Override]
+    public function visitIdentifier(Ast\Identifier $expr)
+    {
+        $this->addToPool($expr->token->lexeme, TYPE::STR);
+    }
 
     public function visitAssignExpr(Ast\AssignExpr $expr) {}
     public function visitBlock(Ast\Block $stmt) {}
     public function visitBoolLiteral(Ast\BoolLiteral $expr) {}
-    public function visitCallExpr(Ast\CallExpr $expr) {}
     public function visitConstDeclExpr(Ast\ConstDeclExpr $expr) {}
     public function visitFloatLiteral(Ast\FloatLiteral $expr) {}
     public function visitForStatement(Ast\ForStatement $stmt) {}
-    public function visitIdentifier(Ast\Identifier $expr) {}
     public function visitIfStatement(Ast\IfStatement $stmt) {}
     public function visitNullLiteral(Ast\NullLiteral $expr) {}
     public function visitPostfixExpr(Ast\PostfixExpr $expr) {}
