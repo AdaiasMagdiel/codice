@@ -28,9 +28,5 @@ int main(int argc, char **argv)
     if (!nob_cmd_run(&cmd))
         return 1;
 
-    nob_cmd_append(&cmd, output);
-    if (!nob_cmd_run(&cmd))
-        return 1;
-
     return 0;
 }

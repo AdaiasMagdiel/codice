@@ -8,15 +8,17 @@
 #include "core/reader.h"
 #include "core/builtins.h"
 
-int main()
+int main(int argc, char **argv)
 {
     VM vm;
     unsigned char MAGIC_NUMBER[3] = {0xAD, 0xA1, 0xA5};
 
-    FILE *fp = fopen("./output/program.codb", "rb");
+    const char *path = argc > 1 ? argv[1] : "./output/program.codc";
+
+    FILE *fp = fopen(path, "rb");
     if (fp == NULL)
     {
-        fprintf(stderr, "Error: File not found.\n");
+        fprintf(stderr, "Error: File '%s' not found.\n", path);
         return -1;
     }
     fseek(fp, 0, SEEK_END);

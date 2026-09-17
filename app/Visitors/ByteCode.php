@@ -38,7 +38,6 @@ class ByteCode implements Visitor
     private int $poolPos   = 0;
 
     public function __construct(
-        private Environment $environment,
         private string $outputFile
     ) {}
 

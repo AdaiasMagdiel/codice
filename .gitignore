@@ -16,3 +16,4 @@ bytecode/nob.exe
 bytecode/nob.exe.old
 bytecode/dist/
 bytecode/output/
+bytecode/**/*.codc

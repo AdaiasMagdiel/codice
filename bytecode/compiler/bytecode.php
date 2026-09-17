@@ -2,28 +2,23 @@
 
 use App\Lexer\Scanner;
 use App\Parser\Parser;
-use App\Runtime\Environment;
 use App\Visitors\ByteCode;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
 
-$outputFile = __DIR__ . "/../output/program.codb";
+$file = $argv[1] ?? __DIR__ . '/programs/hello_world.cod';
 
-if ($argc === 1) {
-	$scanner = new Scanner();
-	$parser = new Parser();
-	$bytecode = new ByteCode(new Environment(), $outputFile);
+$outputFile = __DIR__ . '/../output/' . pathinfo($file, PATHINFO_FILENAME) . '.codc';
 
-	$file = __DIR__ . '/programs/hello_world.cod';
-	$scanner->init(basename($file), file_get_contents($file));
+$scanner = new Scanner();
+$parser = new Parser();
+$bytecode = new ByteCode($outputFile);
 
-	$tokens = $scanner->scan();
-	$parser->init($tokens);
+$scanner->init(basename($file), file_get_contents($file));
 
-	$program = $parser->parse();
+$tokens = $scanner->scan();
+$parser->init($tokens);
 
-	$program->accept($bytecode);
-	exit(0);
-}
+$program = $parser->parse();
 
-echo "---";
+$program->accept($bytecode);
