@@ -33,7 +33,7 @@ Value builtin_stampa(uint32_t arg_count, VM *vm)
 
     for (uint32_t i = 0; i < arg_count; i++)
     {
-        args[arg_count - 1 - i] = popVM(vm);
+        args[i] = popVM(vm);
     }
 
     size_t length = 0;
