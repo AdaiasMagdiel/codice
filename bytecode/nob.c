@@ -23,7 +23,8 @@ int main(int argc, char **argv)
         "core/vm.c",
         "core/reader.c",
         "core/builtins.c",
-        "core/builtins/stampa.c");
+        "core/builtins/stampa.c",
+        "core/ops/add.c");
 
     if (!nob_cmd_run(&cmd))
         return 1;
