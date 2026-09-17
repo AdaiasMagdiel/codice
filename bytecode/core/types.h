@@ -8,9 +8,10 @@
 #define TYPE_STRING 0x03
 
 #define OP_LOAD_CONST 0x01
-#define OP_PUSH 0x02
-#define OP_ADD 0x03
-#define OP_CALL_FUNC 0x04
+#define OP_STORE_LOCAL 0x02
+#define OP_LOAD_LOCAL 0x03
+#define OP_ADD 0x04
+#define OP_CALL_FUNC 0x05
 
 typedef struct
 {
@@ -25,8 +26,11 @@ typedef struct
 typedef struct
 {
     Value *stack;
-    uint32_t capacity;
     Value *top;
+    uint32_t capacity;
+
+    Value *locals;
+    uint16_t locals_count;
 } VM;
 
 #endif

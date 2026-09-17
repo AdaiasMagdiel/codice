@@ -23,3 +23,20 @@ uint32_t read_u32(FILE *fp)
            ((uint32_t)b[2] << 8) |
            (uint32_t)b[3];
 }
+
+uint16_t read_u16_bc(uint8_t *bytecode, uint32_t *ip)
+{
+    uint16_t value = (bytecode[*ip] << 8) | bytecode[*ip + 1];
+    *ip += 2;
+    return value;
+}
+
+uint32_t read_u32_bc(uint8_t *bytecode, uint32_t *ip)
+{
+    uint32_t value = ((uint32_t)bytecode[*ip] << 24) |
+                      ((uint32_t)bytecode[*ip + 1] << 16) |
+                      ((uint32_t)bytecode[*ip + 2] << 8) |
+                      (uint32_t)bytecode[*ip + 3];
+    *ip += 4;
+    return value;
+}
