@@ -2,10 +2,12 @@
 
 namespace App;
 
+use App\Bytecode\Disassembler;
 use App\Exceptions\CodiceError;
 use App\Lexer\Scanner;
 use App\Parser\Parser;
 use App\Runtime\Environment;
+use App\Visitors\ByteCode;
 use App\Visitors\Interpreter;
 use Throwable;
 
@@ -76,6 +78,53 @@ class Codice
 			return 1;
 		} catch (Throwable $e) {
 			echo $e->getMessage();
+			return 1;
+		}
+
+		return 0;
+	}
+
+	public function compileFile(string $filePath, ?string $outputFile = null): int
+	{
+		if (!is_file($filePath)) {
+			echo "Errore: Il file '$filePath' non esiste.\n";
+			return 1;
+		}
+
+		$outputFile ??= realpath(__DIR__ . '/..') . '/bytecode/output/' . pathinfo($filePath, PATHINFO_FILENAME) . '.codc';
+
+		$outputDir = dirname($outputFile);
+		if (!is_dir($outputDir)) {
+			mkdir($outputDir, recursive: true);
+		}
+
+		try {
+			$this->scanner->init(basename($filePath), file_get_contents($filePath));
+
+			$tokens = $this->scanner->scan();
+			$this->parser->init($tokens);
+
+			$program = $this->parser->parse();
+
+			$program->accept(new ByteCode($outputFile));
+		} catch (CodiceError $e) {
+			echo $e;
+			return 1;
+		} catch (Throwable $e) {
+			echo $e->getMessage() . "\n";
+			return 1;
+		}
+
+		echo "Bytecode scritto in '$outputFile'.\n";
+		return 0;
+	}
+
+	public function disassembleFile(string $filePath): int
+	{
+		try {
+			(new Disassembler())->disassemble($filePath);
+		} catch (Throwable $e) {
+			echo $e->getMessage() . "\n";
 			return 1;
 		}
 
