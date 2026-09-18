@@ -91,7 +91,7 @@ class Codice
 			return 1;
 		}
 
-		$outputFile ??= realpath(__DIR__ . '/..') . '/bytecode/output/' . pathinfo($filePath, PATHINFO_FILENAME) . '.codc';
+		$outputFile ??= ROOT_DIR . '/bytecode/output/' . pathinfo($filePath, PATHINFO_FILENAME) . '.codc';
 
 		$outputDir = dirname($outputFile);
 		if (!is_dir($outputDir)) {
