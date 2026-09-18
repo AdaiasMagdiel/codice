@@ -1,0 +1,5 @@
+sia nome  = "Adaías Magdiel";
+sia idade = 24;
+
+stampa("Oi, " + nome + ", tudo bom?");
+stampa("Você tem " + idade + " anos.");
