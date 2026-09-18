@@ -1,0 +1,5 @@
+se (falso) {
+	stampa("Non vedrai mai questo messaggio.");
+} altrimenti {
+	stampa("La condizione era falsa, quindi eseguo questo blocco.");
+}
