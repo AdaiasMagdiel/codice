@@ -3,12 +3,11 @@
 namespace App\Visitors;
 
 use App\Ast;
+use App\Types;
 use App\Enums\Operation;
 use App\Enums\TokenType;
 use App\Enums\VMType;
 use App\Exceptions\RuntimeError;
-use App\Lexer\Token;
-use App\Types;
 use Exception;
 use Override;
 use TypeError;
@@ -215,6 +214,12 @@ class ByteCode implements Visitor
     }
 
     #[Override]
+    public function visitFloatLiteral(Ast\FloatLiteral $expr)
+    {
+        $this->addToPool($expr->token->lexeme, VMType::FLOAT);
+    }
+
+    #[Override]
     public function visitStringLiteral(Ast\StringLiteral $expr)
     {
         $this->addToPool($expr->token->lexeme, VMType::STR);
@@ -253,7 +258,6 @@ class ByteCode implements Visitor
 
     public function visitAssignExpr(Ast\AssignExpr $expr) {}
     public function visitConstDeclExpr(Ast\ConstDeclExpr $expr) {}
-    public function visitFloatLiteral(Ast\FloatLiteral $expr) {}
     public function visitForStatement(Ast\ForStatement $stmt) {}
     public function visitPostfixExpr(Ast\PostfixExpr $expr) {}
     public function visitUnaryExpr(Ast\UnaryExpr $expr) {}
