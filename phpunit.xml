@@ -20,5 +20,9 @@
             <directory>app/Types</directory>
             <directory>app/Visitors</directory>
         </include>
+        <exclude>
+            <!-- Bytecode compiler PoC, still under active development and untested -->
+            <file>app/Visitors/ByteCode.php</file>
+        </exclude>
     </source>
 </phpunit>
