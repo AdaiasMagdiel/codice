@@ -71,7 +71,7 @@ void freeConstantPool(Value *pool, uint16_t pool_size)
 
     for (int i = 0; i < pool_size; i++)
     {
-        if (pool[i].type == TYPE_STRING && pool[i].as.as_string != NULL)
+        if (pool[i].type == TYPE_STR && pool[i].as.as_string != NULL)
         {
             free(pool[i].as.as_string);
         }

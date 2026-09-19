@@ -3,9 +3,10 @@
 
 #include <stdint.h>
 
-#define TYPE_NULL 0x01
-#define TYPE_INT 0x02
-#define TYPE_STRING 0x03
+#define TYPE_NULL        0x01
+#define TYPE_INT         0x02
+#define TYPE_FLOAT       0x03
+#define TYPE_STR         0x04
 
 #define OP_LOAD_CONST 0x01
 #define OP_STORE_LOCAL 0x02

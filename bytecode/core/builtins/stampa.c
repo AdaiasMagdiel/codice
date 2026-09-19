@@ -11,7 +11,7 @@ static int format_value(char *buf, size_t bufsize, Value v)
     {
         return snprintf(buf, bufsize, "%d", v.as.as_int);
     }
-    else if (v.type == TYPE_STRING)
+    else if (v.type == TYPE_STR)
     {
         return snprintf(buf, bufsize, "%s", v.as.as_string);
     }

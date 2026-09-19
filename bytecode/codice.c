@@ -29,7 +29,7 @@ void init_constant_pool(FILE *fp, Value **out_pool, uint16_t *out_pool_size)
         {
             pool[i].as.as_int = read_u32(fp);
         }
-        else if (pool[i].type == TYPE_STRING)
+        else if (pool[i].type == TYPE_STR)
         {
             uint32_t length = read_u32(fp);
 
