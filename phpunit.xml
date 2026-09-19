@@ -22,7 +22,8 @@
         </include>
         <exclude>
             <!-- Bytecode compiler PoC, still under active development and untested -->
-            <file>app/Visitors/ByteCode.php</file>
+            <file>app/Visitors/BytecodeCompiler.php</file>
+            <file>app/Visitors/TypeChecker.php</file>
         </exclude>
     </source>
 </phpunit>
