@@ -3,14 +3,12 @@
 namespace App\Visitors;
 
 use App\Ast;
-use App\Types;
 use App\Enums\Operation;
 use App\Enums\TokenType;
 use App\Enums\VMType;
 use App\Exceptions\RuntimeError;
 use Exception;
 use Override;
-use TypeError;
 
 define('MAGIC_SIGNATURE', 0xADA1A5); // 24 bits
 define('BYTECODE_VERSION', 0x01);   // 8 bits
@@ -19,7 +17,7 @@ define('BYTECODE_VERSION', 0x01);   // 8 bits
 // 0xADA1A500 | 0x01 = 0xADA1A501
 define('MAGIC_NUMBER', (MAGIC_SIGNATURE << 8) | BYTECODE_VERSION);
 
-class ByteCode implements Visitor
+class BytecodeCompiler implements Visitor
 {
     private string $header  = '';
     private string $buffer  = '';
@@ -226,16 +224,31 @@ class ByteCode implements Visitor
     #[Override]
     public function visitBinaryExpr(Ast\BinaryExpr $expr)
     {
-        $op = $expr->op;
+        // Constant folding: evaluate string repetition at compile time
+        if ($expr->op->type === TokenType::STAR) {
+            if (
+                ($expr->left instanceof Ast\StringLiteral && $expr->right instanceof Ast\IntLiteral) ||
+                ($expr->left instanceof Ast\IntLiteral && $expr->right instanceof Ast\StringLiteral)
+            ) {
+                [$str, $times] = ($expr->left instanceof Ast\StringLiteral)
+                    ? [$expr->left->token->lexeme, $expr->right->token->lexeme]
+                    : [$expr->right->token->lexeme, $expr->left->token->lexeme];
+
+                $this->addToPool(str_repeat($str, (int) $times), VMType::STR);
+                return;
+            }
+        }
 
         $expr->left->accept($this);
         $expr->right->accept($this);
 
-        switch ($op->type) {
-            case TokenType::PLUS:
-                $this->addInstruction(Operation::ADD);
-                break;
-        }
+        $opcode = match ($expr->op->type) {
+            TokenType::PLUS  => Operation::ADD,
+            TokenType::MINUS => Operation::SUB,
+            TokenType::STAR  => Operation::MULT,
+            TokenType::SLASH => Operation::DIV,
+        };
+        $this->addInstruction($opcode);
     }
 
     #[Override]

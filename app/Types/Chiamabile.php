@@ -9,7 +9,8 @@ class Chiamabile extends Type
 {
     public function __construct(
         public string $name,
-        public Closure $fn
+        public Closure $fn,
+        public Type $returnType = new Nullo()
     ) {}
 
     #[Override]

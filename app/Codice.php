@@ -7,8 +7,9 @@ use App\Exceptions\CodiceError;
 use App\Lexer\Scanner;
 use App\Parser\Parser;
 use App\Runtime\Environment;
-use App\Visitors\ByteCode;
+use App\Visitors\BytecodeCompiler;
 use App\Visitors\Interpreter;
+use App\Visitors\TypeChecker;
 use Throwable;
 
 class Codice
@@ -106,7 +107,8 @@ class Codice
 
 			$program = $this->parser->parse();
 
-			$program->accept(new ByteCode($outputFile));
+			$program->accept(new TypeChecker());
+			$program->accept(new BytecodeCompiler($outputFile));
 		} catch (CodiceError $e) {
 			echo $e;
 			return 1;
