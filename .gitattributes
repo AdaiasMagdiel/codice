@@ -1,0 +1,6 @@
+# nob.h is a vendored third-party single-header library, not our code.
+bytecode/libs/nob.h linguist-vendored
+
+# GitHub Linguist defaults ambiguous .h files to C++; this project's
+# headers are plain C.
+*.h linguist-language=C
