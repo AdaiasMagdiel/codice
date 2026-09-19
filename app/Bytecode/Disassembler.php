@@ -8,13 +8,21 @@ use Exception;
 
 class Disassembler
 {
-    private const OP_OPERAND_SIZE = [
-        Operation::LOAD_CONST->value  => 2, // uint16 pool index
-        Operation::STORE_LOCAL->value => 2, // uint16 symbol index
-        Operation::LOAD_LOCAL->value  => 2, // uint16 symbol index
-        Operation::ADD->value         => 0,
-        Operation::CALL_FUNC->value   => 0,
-    ];
+    private function operandSize(Operation $op): int
+    {
+        return match ($op) {
+            Operation::LOAD_CONST,
+            Operation::STORE_LOCAL,
+            Operation::LOAD_LOCAL,
+            Operation::JUMP_IF_FALSE,
+            Operation::JUMP        => 2, // uint16
+            Operation::ADD,
+            Operation::CALL_FUNC,
+            Operation::PUSH_TRUE,
+            Operation::PUSH_FALSE,
+            Operation::PUSH_NULL   => 0,
+        };
+    }
 
     /** @var resource */
     private $fp;
@@ -102,6 +110,8 @@ class Disassembler
     {
         printf("\n=== Instructions ===\n");
 
+        $bufferStart = ftell($this->fp);
+
         while (true) {
             $offset = ftell($this->fp);
             $opByte = fread($this->fp, 1);
@@ -110,7 +120,7 @@ class Disassembler
 
             $operation = Operation::tryFrom($op);
             $opName = $operation?->name ?? sprintf('UNKNOWN(0x%02X)', $op);
-            $operandSize = self::OP_OPERAND_SIZE[$op] ?? 0;
+            $operandSize = $operation === null ? 0 : $this->operandSize($operation);
 
             $operandStr = '';
             $comment = '';
@@ -119,6 +129,9 @@ class Disassembler
                 $operandStr = "#{$operand}";
                 if ($operation === Operation::LOAD_CONST && isset($pool[$operand])) {
                     $comment = "; {$pool[$operand]}";
+                }
+                if ($operation === Operation::JUMP_IF_FALSE || $operation === Operation::JUMP) {
+                    $comment = sprintf("; -> %04X", $bufferStart + $operand);
                 }
             }
 

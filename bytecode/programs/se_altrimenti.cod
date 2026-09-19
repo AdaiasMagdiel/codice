@@ -1,4 +1,6 @@
-se (falso) {
+sia x = -1;
+
+se (-1 + 1) {
 	stampa("Non vedrai mai questo messaggio.");
 } altrimenti {
 	stampa("La condizione era falsa, quindi eseguo questo blocco.");

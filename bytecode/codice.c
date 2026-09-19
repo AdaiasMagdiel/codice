@@ -202,8 +202,37 @@ int main(int argc, char **argv)
             break;
         }
 
+        case OP_PUSH_TRUE: // 0x06
+            pushVM(&vm, VAL_BOOL(1));
+            break;
+
+        case OP_PUSH_FALSE: // 0x07
+            pushVM(&vm, VAL_BOOL(0));
+            break;
+
+        case OP_PUSH_NULL: // 0x08
+            pushVM(&vm, VAL_NULL());
+            break;
+
+        case OP_JUMP_IF_FALSE: {
+            uint16_t offset = read_u16_bc(bytecode, &ip);
+
+            Value cond = popVM(&vm);
+
+            if (is_falsy(cond)) {
+                ip = offset;
+            }
+            break;
+        }
+
+        case OP_JUMP: {
+            uint16_t offset = read_u16_bc(bytecode, &ip);
+            ip = offset;
+            break;
+        }
+
         default:
-            runtime_error(&vm, constant_pool, pool_size, "Error: Operation '%d' not implemented.", op);
+            runtime_error(&vm, constant_pool, pool_size, "Error: Operation '0x%02X' not implemented.", op);
             break;
         }
     }

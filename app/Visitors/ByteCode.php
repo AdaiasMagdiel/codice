@@ -121,10 +121,41 @@ class ByteCode implements Visitor
     {
         $stmt->condition->accept($this);
 
+        $this->addInstruction(Operation::JUMP_IF_FALSE);
+        $ifPos = strlen($this->buffer);
+        $this->buffer .= $this->uint_16(0x0000);
+
         $stmt->then->accept($this);
 
+        $offset = strlen($this->buffer);
+        $this->buffer = substr_replace(
+            $this->buffer,
+            $this->uint_16($offset),
+            $ifPos,
+            2
+        );
+
         if (!is_null($stmt->else)) {
+            $this->addInstruction(Operation::JUMP);
+            $elsePos = strlen($this->buffer);
+            $this->buffer .= $this->uint_16(0x0000);
+
+            $this->buffer = substr_replace(
+                $this->buffer,
+                $this->uint_16($elsePos + 2),
+                $ifPos,
+                2
+            );
+
             $stmt->else->accept($this);
+
+            $offset = strlen($this->buffer);
+            $this->buffer = substr_replace(
+                $this->buffer,
+                $this->uint_16($offset),
+                $elsePos,
+                2
+            );
         }
     }
 
